@@ -37,13 +37,14 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 🏛️ Fixed Deposits | ✅ Complete | Maturity calc, progress bar |
 | 🏦 Liquid Cash | ✅ Complete | Balance update via API |
 | 📊 Wealth Projection | ✅ Complete | SIP formula, debounced sliders |
-| 🔐 Authentication | 🔄 In Progress | JWT login/signup — replacing `demo_user` hardcode |
-| 👤 User Profiles | 🔄 In Progress | Per-user data isolation |
+| 🔐 Authentication | ✅ Complete | JWT login/signup with BCrypt |
+| 👤 User Profiles | ✅ Complete | Per-user data isolation and DB storage |
 | 📬 Monthly Budget Alerts | 🔜 Planned | Email alert when spend exceeds budget |
-| 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
-| 📱 Mobile Responsive UI | 🔜 Planned | Sidebar collapses, touch-friendly forms |
+| 🔄 Live Stock Price Sync | ✅ Complete | Cron job & Manual Sync to auto-fetch CMP from NSE API |
+| 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly grid layouts |
 | 📤 Export to CSV / PDF | 🔜 Planned | Download expense reports and portfolio snapshot |
 | 🌙 Light Mode Toggle | 🔜 Planned | Currently dark-only |
+| 🌍 Internationalization | ✅ Complete | Dynamic multi-currency support |
 
 ---
 
@@ -131,8 +132,7 @@ finance-ecosystem/
     │       ├── ExpenseTracker.jsx# Full CRUD on /api/expenses
     │       ├── Portfolio.jsx     # Stocks / MF / FD / Liquid tabs
     │       └── WealthProjection.jsx # /api/summary/projection + sliders
-    ├── index.html
-    ├── vite.config.js            # Proxy /api → localhost:5000
+    ├── public/
     └── package.json
 ```
 
@@ -322,14 +322,14 @@ NODE_ENV=development
 cd backend && npm run dev      # ✅ FinFlow API running on port 5000
 
 # Terminal 2
-cd frontend && npm run dev     # → http://localhost:5173
+cd frontend && npm start       # → http://localhost:3000
 ```
 
 ### 4 — Verify
 
 | Check | URL |
 |-------|-----|
-| Frontend loads | `http://localhost:5173` |
+| Frontend loads | `http://localhost:3000` |
 | API health | `http://localhost:5000/health` |
 | Full snapshot | `http://localhost:5000/api/summary` |
 | Projection test | `http://localhost:5000/api/summary/projection?monthly=20000&rate=12&years=20` |
@@ -341,7 +341,7 @@ cd frontend && npm run dev     # → http://localhost:5173
 | Layer | Technology | Version |
 |-------|-----------|---------|
 | Frontend framework | React | 18 |
-| Build tool | Vite | 5 |
+| Build tool | Create React App | 5 |
 | Charts | Recharts | 2 |
 | HTTP client | Axios | 1.7 |
 | Backend framework | Express | 4 |

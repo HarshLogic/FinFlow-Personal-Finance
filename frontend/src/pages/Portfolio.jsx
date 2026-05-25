@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  getStocks, createStock, deleteStock, updateCMP,
+  getStocks, createStock, deleteStock, updateCMP, syncStocks,
   getMF, createMF, deleteMF,
   getFDs, createFD, deleteFD,
   getLiquid, updateLiquid,
@@ -54,6 +54,18 @@ function StocksTab() {
   };
   useEffect(() => { load(); }, []);
 
+  const handleSync = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await syncStocks();
+      await load();
+    } catch (e) {
+      setError(e.response?.data?.error || "Sync failed");
+      setSaving(false);
+    }
+  };
+
   const add = async (vals) => {
     if (!vals.ticker || !vals.qty || !vals.avgPrice) return;
     setSaving(true);
@@ -100,7 +112,12 @@ function StocksTab() {
       </div>
 
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Add Stock</SectionTitle>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <SectionTitle>Add Stock</SectionTitle>
+          <button onClick={handleSync} disabled={saving} style={{ padding: "6px 12px", background: C.surface, color: C.text, border: `1px solid ${C.border}`, borderRadius: 8, cursor: saving ? "not-allowed" : "pointer", fontSize: 12 }}>
+            {saving ? "Syncing..." : "🔄 Sync Prices"}
+          </button>
+        </div>
         <AddRow saving={saving} onAdd={add} fields={[
           { key: "ticker",   placeholder: "TICKER", width: 90 },
           { key: "qty",      placeholder: "Qty",    type: "number", width: 70 },

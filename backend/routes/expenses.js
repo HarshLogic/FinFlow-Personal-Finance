@@ -1,77 +1,57 @@
 const router   = require("express").Router();
 const { Expense } = require("../models");
+const auth = require("../middleware/auth");
  
-const USER = "demo_user"; // replace with JWT auth middleware later
+router.use(auth);
  
-// GET  /api/expenses  — list with optional filters
-router.get("/", async (req, res) => {
-  try {
-    const { type, category, from, to, page = 1, limit = 50 } = req.query;
-    const filter = { userId: USER };
-    if (type)     filter.type     = type;
-    if (category) filter.category = category;
-    if (from || to) {
-      filter.date = {};
-      if (from) filter.date.$gte = new Date(from);
-      if (to)   filter.date.$lte = new Date(to);
-    }
-    const expenses = await Expense.find(filter)
-      .sort({ date: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
-    const total = await Expense.countDocuments(filter);
-    res.json({ expenses, total, page: Number(page) });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
- 
-// POST /api/expenses
-router.post("/", async (req, res) => {
-  try {
-    const expense = await Expense.create({ ...req.body, userId: USER });
-    res.status(201).json(expense);
-  } catch (e) { res.status(400).json({ error: e.message }); }
-});
- 
-// PUT  /api/expenses/:id
-router.put("/:id", async (req, res) => {
-  try {
-    const expense = await Expense.findOneAndUpdate(
-      { _id: req.params.id, userId: USER },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!expense) return res.status(404).json({ error: "Not found" });
-    res.json(expense);
-  } catch (e) { res.status(400).json({ error: e.message }); }
-});
- 
-// DELETE /api/expenses/:id
-router.delete("/:id", async (req, res) => {
-  try {
-    const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: USER });
-    if (!expense) return res.status(404).json({ error: "Not found" });
-    res.json({ message: "Deleted" });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
- 
-// GET /api/expenses/analytics  — need vs want breakdown by month
-router.get("/analytics", async (req, res) => {
-  try {
-    const agg = await Expense.aggregate([
-      { $match: { userId: USER } },
-      { $group: {
+
+router.get("/", asyncHandler(async (req, res) => {
+  const { page = 1, limit = 50 } = req.query;
+  const expenses = await Expense.find({ userId: req.user.id })
+    .sort({ date: -1 })
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+  const total = await Expense.countDocuments({ userId: req.user.id });
+  res.json({ expenses, total, page: Number(page), pages: Math.ceil(total / limit) });
+}));
+
+router.post("/", asyncHandler(async (req, res) => {
+  const expense = await Expense.create({ ...req.body, userId: req.user.id });
+  res.status(201).json(expense);
+}));
+
+router.put("/:id", asyncHandler(async (req, res) => {
+  const expense = await Expense.findOneAndUpdate(
+    { _id: req.params.id, userId: req.user.id }, req.body,
+    { new: true, runValidators: true }
+  );
+  if (!expense) return res.status(404).json({ error: "Not found" });
+  res.json(expense);
+}));
+
+router.delete("/:id", asyncHandler(async (req, res) => {
+  await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+  res.json({ message: "Deleted" });
+}));
+
+router.get("/analytics", asyncHandler(async (req, res) => {
+  const pipeline = [
+    { $match: { userId: req.user.id } },
+    {
+      $group: {
         _id: {
-          year:  { $year:  "$date" },
           month: { $month: "$date" },
-          type:  "$type",
+          year: { $year: "$date" },
+          category: "$category",
+          type: "$type"
         },
-        total: { $sum: "$amount" },
-        count: { $sum: 1 },
-      }},
-      { $sort: { "_id.year": 1, "_id.month": 1 } },
-    ]);
-    res.json(agg);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
- 
+        total: { $sum: "$amount" }
+      }
+    },
+    { $sort: { "_id.year": 1, "_id.month": 1 } }
+  ];
+  const analytics = await Expense.aggregate(pipeline);
+  res.json(analytics);
+}));
+
 module.exports = router;

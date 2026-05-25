@@ -38,6 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/auth",        require("./routes/auth"));
 app.use("/api/expenses",    require("./routes/expenses"));
 app.use("/api/stocks",      require("./routes/stocks"));
 app.use("/api/mutualfunds", mfRouter);
@@ -47,6 +48,12 @@ app.use("/api/summary",     require("./routes/summary"));
  
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
+
+// ── Global Error Handler ──────────────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err.message);
+  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
+});
  
 // ── DB + Server ───────────────────────────────────────────────────────────────
 mongoose
