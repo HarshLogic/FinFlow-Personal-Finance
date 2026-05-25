@@ -2,16 +2,17 @@ import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getExpenses, createExpense, deleteExpense } from "../api";
 import { C, fmt, MetricCard, SectionTitle, Pill, Spinner, ErrorBox, CAT_ICON, CATEGORIES } from "../shared";
+import { downloadExpensesCSV } from "../api";
 
 const EMPTY = { date: "", category: "Food", label: "", amount: "", type: "need", notes: "" };
 
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState([]);
-  const [form,     setForm]     = useState(EMPTY);
-  const [filter,   setFilter]   = useState("all");
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
-  const [error,    setError]    = useState(null);
+  const [form, setForm] = useState(EMPTY);
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -46,33 +47,10 @@ export default function ExpenseTracker() {
 
 
 
- const handleExport = async () => {
-  if (!expenses || expenses.length === 0) {
-    setError("No transactions available to export.");
-    return;
-  }
-  try {
-    const response = await exportExpenses();
-    const blob = response.data instanceof Blob
-      ? response.data
-      : new Blob([response.data], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "finflow-transactions.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  } catch (e) {
-    setError("Failed to export transactions. Please try again.");
-  }
-};
-
   // ── Derived ────────────────────────────────────────────────────────────────
-  const needSpend  = expenses.filter(e => e.type === "need").reduce((s, e) => s + e.amount, 0);
-  const wantSpend  = expenses.filter(e => e.type === "want").reduce((s, e) => s + e.amount, 0);
-  const filtered   = filter === "all" ? expenses : expenses.filter(e => e.type === filter);
+  const needSpend = expenses.filter(e => e.type === "need").reduce((s, e) => s + e.amount, 0);
+  const wantSpend = expenses.filter(e => e.type === "want").reduce((s, e) => s + e.amount, 0);
+  const filtered = filter === "all" ? expenses : expenses.filter(e => e.type === filter);
 
   const catData = CATEGORIES.map(c => ({
     name: c,
@@ -82,14 +60,36 @@ export default function ExpenseTracker() {
 
   if (loading) return <Spinner />;
 
+  const handleDownloadCSV = async () => {
+    try {
+      const blob = await downloadExpensesCSV();
+
+      const url = window.URL.createObjectURL(
+        new Blob([blob], { type: "text/csv" })
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "transactions.csv");
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("CSV download failed", err);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {error && <ErrorBox message={error} onRetry={load} />}
 
       {/* Metrics */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="✅" label="Total Needs"   value={fmt(needSpend)}  subColor={C.green} sub="Essential expenses" />
-        <MetricCard icon="🎯" label="Total Wants"   value={fmt(wantSpend)}  subColor={C.gold}  sub="Lifestyle expenses" />
+        <MetricCard icon="✅" label="Total Needs" value={fmt(needSpend)} subColor={C.green} sub="Essential expenses" />
+        <MetricCard icon="🎯" label="Total Wants" value={fmt(wantSpend)} subColor={C.gold} sub="Lifestyle expenses" />
         <MetricCard icon="📋" label="Total Entries" value={expenses.length}
           sub={`${expenses.filter(e => e.type === "need").length} needs · ${expenses.filter(e => e.type === "want").length} wants`} />
       </div>
@@ -99,9 +99,9 @@ export default function ExpenseTracker() {
         <SectionTitle>Add Expense</SectionTitle>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           {[
-            { field: "date",   type: "date",   placeholder: "Date",        width: 145 },
-            { field: "label",  type: "text",   placeholder: "Description", width: 160 },
-            { field: "amount", type: "number", placeholder: "Amount ₹",   width: 120 },
+            { field: "date", type: "date", placeholder: "Date", width: 145 },
+            { field: "label", type: "text", placeholder: "Description", width: 160 },
+            { field: "amount", type: "number", placeholder: "Amount ₹", width: 120 },
           ].map(f => (
             <input key={f.field} type={f.type} placeholder={f.placeholder}
               value={form[f.field]}
@@ -155,7 +155,7 @@ export default function ExpenseTracker() {
               <Tooltip formatter={v => fmt(v)}
                 contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text }} />
               <Bar dataKey="need" fill={C.green} radius={[4, 4, 0, 0]} name="Need" />
-              <Bar dataKey="want" fill={C.gold}  radius={[4, 4, 0, 0]} name="Want" />
+              <Bar dataKey="want" fill={C.gold} radius={[4, 4, 0, 0]} name="Want" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -164,7 +164,24 @@ export default function ExpenseTracker() {
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, flex: "1 1 300px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <SectionTitle>Transactions</SectionTitle>
-            <div style={{ display: "flex", gap: 6 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+
+              <button
+                onClick={handleDownloadCSV}
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: 8,
+                  border: `1px solid ${C.green}`,
+                  background: C.green + "22",
+                  color: C.green,
+                  cursor: "pointer",
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}
+              >
+                Export CSV
+              </button>
+
               {["all", "need", "want"].map(f => (
                 <button key={f} onClick={() => setFilter(f)}
                   style={{

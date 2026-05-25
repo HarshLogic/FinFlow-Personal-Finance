@@ -47,3 +47,12 @@ export const updateLiquid   = (balance) => api.put("/liquid", { balance });
 // ── Summary ───────────────────────────────────────────────────────────────────
 export const getSummary     = ()       => api.get("/summary");
 export const getProjection  = (params) => api.get("/summary/projection", { params });
+
+// Download CSV file
+export const downloadExpensesCSV = async () => {
+  const response = await axios.get("/api/expenses/export/csv", {
+    responseType: "blob",
+  });
+
+  return response.data;
+};
