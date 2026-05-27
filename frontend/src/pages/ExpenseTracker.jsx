@@ -7,11 +7,12 @@ const EMPTY = { date: "", category: "Food", label: "", amount: "", type: "need",
 
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState([]);
-  const [form,     setForm]     = useState(EMPTY);
-  const [filter,   setFilter]   = useState("all");
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
-  const [error,    setError]    = useState(null);
+  const [form, setForm] = useState(EMPTY);
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [monthlyLimit, setMonthlyLimit] = useState(20000);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -46,33 +47,12 @@ export default function ExpenseTracker() {
 
 
 
- const handleExport = async () => {
-  if (!expenses || expenses.length === 0) {
-    setError("No transactions available to export.");
-    return;
-  }
-  try {
-    const response = await exportExpenses();
-    const blob = response.data instanceof Blob
-      ? response.data
-      : new Blob([response.data], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "finflow-transactions.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  } catch (e) {
-    setError("Failed to export transactions. Please try again.");
-  }
-};
+  
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  const needSpend  = expenses.filter(e => e.type === "need").reduce((s, e) => s + e.amount, 0);
-  const wantSpend  = expenses.filter(e => e.type === "want").reduce((s, e) => s + e.amount, 0);
-  const filtered   = filter === "all" ? expenses : expenses.filter(e => e.type === filter);
+  const needSpend = expenses.filter(e => e.type === "need").reduce((s, e) => s + e.amount, 0);
+  const wantSpend = expenses.filter(e => e.type === "want").reduce((s, e) => s + e.amount, 0);
+  const filtered = filter === "all" ? expenses : expenses.filter(e => e.type === filter);
 
   const catData = CATEGORIES.map(c => ({
     name: c,
@@ -82,16 +62,100 @@ export default function ExpenseTracker() {
 
   if (loading) return <Spinner />;
 
+  const currentDate = new Date();
+
+  const monthlySpend = expenses
+    .filter(e => {
+      const d = new Date(e.date);
+
+      return (
+        d.getMonth() === currentDate.getMonth() &&
+        d.getFullYear() === currentDate.getFullYear()
+      );
+    })
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const spendPercentage =
+    monthlyLimit > 0
+      ? Math.min((monthlySpend / monthlyLimit) * 100, 100)
+      : 0;
+
+  const limitExceeded = monthlySpend > monthlyLimit;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {error && <ErrorBox message={error} onRetry={load} />}
 
       {/* Metrics */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="✅" label="Total Needs"   value={fmt(needSpend)}  subColor={C.green} sub="Essential expenses" />
-        <MetricCard icon="🎯" label="Total Wants"   value={fmt(wantSpend)}  subColor={C.gold}  sub="Lifestyle expenses" />
+        <MetricCard icon="✅" label="Total Needs" value={fmt(needSpend)} subColor={C.green} sub="Essential expenses" />
+        <MetricCard icon="🎯" label="Total Wants" value={fmt(wantSpend)} subColor={C.gold} sub="Lifestyle expenses" />
         <MetricCard icon="📋" label="Total Entries" value={expenses.length}
           sub={`${expenses.filter(e => e.type === "need").length} needs · ${expenses.filter(e => e.type === "want").length} wants`} />
+      </div>
+
+      <div
+        style={{
+          background: C.card,
+          border: `1px solid ${limitExceeded ? "#ef4444" : C.border}`,
+          borderRadius: 14,
+          padding: 20,
+        }}
+      >
+        <SectionTitle>Monthly Spending Limit</SectionTitle>
+
+        <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 14 }}>
+          <input
+            type="number"
+            placeholder="Enter monthly limit"
+            value={monthlyLimit}
+            onChange={(e) => setMonthlyLimit(Number(e.target.value))}
+            style={{
+              padding: "10px 12px",
+              background: C.surface,
+              border: `1px solid ${C.border}`,
+              borderRadius: 8,
+              color: C.text,
+              width: 180,
+            }}
+          />
+
+          <div style={{ color: C.text, fontWeight: 600 }}>
+            {fmt(monthlySpend)} / {fmt(monthlyLimit)}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            height: 12,
+            background: C.surface,
+            borderRadius: 999,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${spendPercentage}%`,
+              height: "100%",
+              background: limitExceeded ? "#ef4444" : C.green,
+              transition: "0.3s ease",
+            }}
+          />
+        </div>
+
+        {limitExceeded && (
+          <div
+            style={{
+              marginTop: 12,
+              color: "#ef4444",
+              fontSize: 13,
+              fontWeight: 700,
+            }}
+          >
+            ⚠ Monthly spending limit exceeded!
+          </div>
+        )}
       </div>
 
       {/* Add Expense Form */}
@@ -99,9 +163,9 @@ export default function ExpenseTracker() {
         <SectionTitle>Add Expense</SectionTitle>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           {[
-            { field: "date",   type: "date",   placeholder: "Date",        width: 145 },
-            { field: "label",  type: "text",   placeholder: "Description", width: 160 },
-            { field: "amount", type: "number", placeholder: "Amount ₹",   width: 120 },
+            { field: "date", type: "date", placeholder: "Date", width: 145 },
+            { field: "label", type: "text", placeholder: "Description", width: 160 },
+            { field: "amount", type: "number", placeholder: "Amount ₹", width: 120 },
           ].map(f => (
             <input key={f.field} type={f.type} placeholder={f.placeholder}
               value={form[f.field]}
@@ -155,7 +219,7 @@ export default function ExpenseTracker() {
               <Tooltip formatter={v => fmt(v)}
                 contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text }} />
               <Bar dataKey="need" fill={C.green} radius={[4, 4, 0, 0]} name="Need" />
-              <Bar dataKey="want" fill={C.gold}  radius={[4, 4, 0, 0]} name="Want" />
+              <Bar dataKey="want" fill={C.gold} radius={[4, 4, 0, 0]} name="Want" />
             </BarChart>
           </ResponsiveContainer>
         </div>
