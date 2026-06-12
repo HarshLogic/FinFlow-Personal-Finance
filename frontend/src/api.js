@@ -47,3 +47,5 @@ export const updateLiquid   = (balance) => api.put("/liquid", { balance });
 // ── Summary ───────────────────────────────────────────────────────────────────
 export const getSummary     = ()       => api.get("/summary");
 export const getProjection  = (params) => api.get("/summary/projection", { params });
+export const getBadges      = ()       => api.get("/summary/badges");
+export const getBadgeProgress = ()     => api.get("/summary/badge-progress");
