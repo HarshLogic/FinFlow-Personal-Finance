@@ -1,4 +1,5 @@
 const router   = require("express").Router();
+const { Parser } = require("json2csv");
 const { Expense } = require("../models");
  
 const USER = "demo_user"; // replace with JWT auth middleware later
@@ -22,6 +23,37 @@ router.get("/", async (req, res) => {
     const total = await Expense.countDocuments(filter);
     res.json({ expenses, total, page: Number(page) });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Export expenses as CSV
+router.get("/export/csv", async (req, res) => {
+  try {
+    const expenses = await Expense.find({ userId: "demo_user" })
+      .sort({ date: -1 })
+      .lean();
+
+    const fields = [
+      "date",
+      "category",
+      "label",
+      "amount",
+      "type",
+      "notes",
+    ];
+
+    const parser = new Parser({ fields });
+    const csv = parser.parse(expenses);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("transactions.csv");
+
+    return res.send(csv);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Failed to export CSV",
+    });
+  }
 });
  
 // POST /api/expenses
