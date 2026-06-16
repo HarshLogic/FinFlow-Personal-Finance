@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const { Stock, MutualFund, FixedDeposit, Liquid, Expense } = require("../models");
+const { Stock, MutualFund, FixedDeposit, Liquid, Expense, Badge } = require("../models");
+const { calculateEarnedBadges, calculateBadgeProgress } = require("../utils/badgeCalculator");
 const USER = "demo_user";
  
 // GET /api/summary  — Full portfolio snapshot
@@ -61,6 +62,107 @@ router.get("/", async (req, res) => {
       expenses:{ needSpend, wantSpend, total: needSpend + wantSpend },
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/summary/badges — Get user's earned badges
+router.get("/badges", async (req, res) => {
+  try {
+    const [stocks, mfs, fds, liquid, expenses] = await Promise.all([
+      Stock.find({ userId: USER }),
+      MutualFund.find({ userId: USER }),
+      FixedDeposit.find({ userId: USER }),
+      Liquid.findOne({ userId: USER }),
+      Expense.find({ userId: USER }),
+    ]);
+
+    // Build summary object for badge calculations
+    const stockValue    = stocks.reduce((s, st) => s + st.qty * st.cmp, 0);
+    const stockCost     = stocks.reduce((s, st) => s + st.qty * st.avgPrice, 0);
+    const stockPL       = stockValue - stockCost;
+    const mfValue       = mfs.reduce((s, m) => s + m.currentValue, 0);
+    const mfCost        = mfs.reduce((s, m) => s + m.invested, 0);
+    const mfPL          = mfValue - mfCost;
+    const fdMaturity    = fds.reduce((s, fd) => s + fd.maturityAmount, 0);
+    const fdPrincipal   = fds.reduce((s, fd) => s + fd.principal, 0);
+    const fdInterest    = fdMaturity - fdPrincipal;
+    const liquidBal     = liquid?.balance ?? 0;
+
+    const totalWealth   = liquidBal + stockValue + mfValue + fdMaturity;
+    const totalInvested = stockCost + mfCost + fdPrincipal + liquidBal;
+    const totalPL       = stockPL + mfPL + fdInterest;
+
+    const summary = {
+      summary: {
+        totalWealth,
+        totalInvested,
+        totalPL,
+      },
+      stocks: stocks.length,
+      mf: mfs.length,
+      fds: { maturity: fdMaturity },
+      expenses: expenses,
+    };
+
+    // Calculate earned badges
+    const earnedBadges = await calculateEarnedBadges(summary, expenses);
+
+    // Get badges from DB (already awarded)
+    const dbBadges = await Badge.find({ userId: USER });
+    const dbBadgeIds = new Set(dbBadges.map(b => b.badgeId));
+
+    // Save newly earned badges
+    for (const badge of earnedBadges) {
+      if (!dbBadgeIds.has(badge.badgeId)) {
+        await Badge.create({
+          userId: USER,
+          ...badge,
+        });
+      }
+    }
+
+    // Get all earned badges
+    const allBadges = await Badge.find({ userId: USER }).sort({ earnedAt: -1 });
+
+    res.json({
+      earned: allBadges,
+      count: allBadges.length,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/summary/badge-progress — Get progress toward next badges
+router.get("/badge-progress", async (req, res) => {
+  try {
+    const [stocks, mfs, fds, liquid] = await Promise.all([
+      Stock.find({ userId: USER }),
+      MutualFund.find({ userId: USER }),
+      FixedDeposit.find({ userId: USER }),
+      Liquid.findOne({ userId: USER }),
+    ]);
+
+    const stockValue    = stocks.reduce((s, st) => s + st.qty * st.cmp, 0);
+    const mfValue       = mfs.reduce((s, m) => s + m.currentValue, 0);
+    const fdMaturity    = fds.reduce((s, fd) => s + fd.maturityAmount, 0);
+    const liquidBal     = liquid?.balance ?? 0;
+
+    const totalWealth   = liquidBal + stockValue + mfValue + fdMaturity;
+
+    const summary = {
+      summary: {
+        totalWealth,
+      },
+    };
+
+    const progress = calculateBadgeProgress(summary);
+
+    res.json({
+      upcomingMilestones: progress,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
  
 // GET /api/summary/projection?monthly=&rate=&years=

@@ -97,6 +97,19 @@ const liquidSchema = new Schema({
   balance:   { type: Number, required: true, default: 0 },
   lastUpdated: { type: Date, default: Date.now },
 }, { timestamps: true });
+
+// ── Achievement Badge ─────────────────────────────────────────────────────────
+const badgeSchema = new Schema({
+  userId:     { type: String, required: true, index: true },
+  badgeId:    { type: String, required: true },  // e.g., "first_savings", "500k_saved"
+  title:      { type: String, required: true }, // e.g., "First Savings"
+  description:{ type: String, default: "" },     // Badge description
+  icon:       { type: String, default: "⭐" },   // Emoji/icon for badge
+  earnedAt:   { type: Date, default: Date.now }, // When earned
+  category:   { type: String, enum: ["savings", "spending", "investing", "consistency"], default: "savings" },
+}, { timestamps: true });
+
+badgeSchema.index({ userId: 1, badgeId: 1 });
  
 // ── Exports ───────────────────────────────────────────────────────────────────
 module.exports = {
@@ -105,4 +118,5 @@ module.exports = {
   MutualFund:    mongoose.model("MutualFund",    mutualFundSchema),
   FixedDeposit:  mongoose.model("FixedDeposit",  fixedDepositSchema),
   Liquid:        mongoose.model("Liquid",        liquidSchema),
+  Badge:         mongoose.model("Badge",         badgeSchema),
 };

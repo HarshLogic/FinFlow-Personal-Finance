@@ -3,14 +3,17 @@ import {
   AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { getSummary, getExpenseAnalytics } from "../api";
-import { C, fmt, pct, MetricCard, SectionTitle, Spinner, ErrorBox } from "../shared";
+import { getSummary, getExpenseAnalytics, getBadges, getBadgeProgress } from "../api";
+import { C, fmt, pct, MetricCard, SectionTitle, Spinner, ErrorBox, BadgeShowcase, BadgeProgress } from "../shared";
 
 export default function Dashboard() {
   const [summary,   setSummary]   = useState(null);
   const [analytics, setAnalytics] = useState([]);
+  const [badges,    setBadges]    = useState([]);
+  const [badgeProgress, setBadgeProgress] = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
+  const [badgeError, setBadgeError] = useState(null);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -23,7 +26,22 @@ export default function Dashboard() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  const loadBadges = async () => {
+    setBadgeError(null);
+    try {
+      const [b, p] = await Promise.all([getBadges(), getBadgeProgress()]);
+      setBadges(b.data?.earned || []);
+      setBadgeProgress(p.data?.upcomingMilestones || []);
+    } catch (e) {
+      setBadgeError(e.response?.data?.error || "Failed to load badges");
+      console.error("Badge loading error:", e);
+    }
+  };
+
+  useEffect(() => { 
+    load();
+    loadBadges();
+  }, []);
 
   // ── Build monthly flow from analytics aggregation ──────────────────────────
   const monthNames = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -159,6 +177,25 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Achievement Badges */}
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <SectionTitle>🏆 Achievement Badges</SectionTitle>
+          <span style={{ fontSize: 12, background: C.gold + "22", color: C.gold, padding: "4px 10px", borderRadius: 20, fontWeight: 600 }}>
+            {badges.length} Earned
+          </span>
+        </div>
+        <BadgeShowcase badges={badges} error={badgeError} />
+      </div>
+
+      {/* Progress to Next Badge */}
+      {badgeProgress.length > 0 && (
+        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
+          <SectionTitle>⚡ Progress to Next Badge</SectionTitle>
+          <BadgeProgress milestones={badgeProgress} />
+        </div>
+      )}
     </div>
   );
 }
