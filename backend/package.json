@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_ENV=test jest --runInBand --detectOpenHandles",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -20,5 +20,10 @@
     "mognoose": "^1.0.3",
     "mongoose": "^9.3.3",
     "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.2.0",
+    "supertest": "^7.2.2"
   }
 }
