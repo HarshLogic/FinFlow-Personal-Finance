@@ -293,9 +293,13 @@ Savings → target ≥ 20% of monthly income
 - npm 9+
 - MongoDB Atlas account (free tier works)
 
-### 1 — Install dependencies
+### 1 — Clone and Install dependencies
 
 ```bash
+# Clone the repository and enter the project root
+git clone [https://github.com/your-username/finance-ecosystem.git](https://github.com/your-username/finance-ecosystem.git)
+cd finance-ecosystem
+
 # Backend
 cd backend && npm install
 
