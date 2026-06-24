@@ -93,13 +93,28 @@ export function MetricCard({ C,label, value, sub, subColor, icon }) {
       width: "100%",
       transition: "all 0.3s ease",
     }}>
-      <div style={{ fontSize: 12, color: C.muted, display: "flex", alignItems: "center", gap: 6 }}>
-        {icon && <span style={{ fontSize: 14 }}>{icon}</span>} {label}
+      <div style={{
+        fontSize: 12,
+        color: C.muted,
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }}>
+        {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
+        {label}
       </div>
       <div style={{ fontSize: "clamp(16px, 4vw, 22px)",wordBreak: "break-word",overflowWrap: "anywhere",  fontWeight: 700, color: C.text, fontFamily: "monospace", letterSpacing: "-0.5px" }}>
         {value}
       </div>
-      {sub && <div style={{ fontSize: 12, color: subColor || C.muted }}>{sub}</div>}
+
+      {sub && (
+        <div style={{
+          fontSize: 12,
+          color: subColor || C.muted
+        }}>
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
