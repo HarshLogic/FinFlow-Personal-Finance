@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { Stock } = require("../models");
 const dotenv = require("dotenv");
-const USER = "demo_user";
+const auth = require("../middleware/auth");
+
 dotenv.config();
 
 const toPositiveNumber = (value) => {
@@ -11,29 +12,27 @@ const toPositiveNumber = (value) => {
 
 router.get("/", async (req, res) => {
   try {
-    const stocks = await Stock.find({ userId: USER }).sort({ ticker: 1 });
+    const stocks = await Stock.find({ userId: req.user.id }).sort({ ticker: 1 });
     res.json(stocks);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
  
 router.post("/", async (req, res) => {
-  try {
-    var stockData = {...req.body};
-    const keyword = stockData.ticker;
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+router.get("/", asyncHandler(async (req, res) => {
+  const stocks = await Stock.find({ userId: req.user.id }).sort({ ticker: 1 });
+  res.json(stocks);
+}));
 
-    const tickerResponse = await fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${keyword}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
-    const tickerData = await tickerResponse.json();
-    if(!tickerData["bestMatches"]?.length){throw new Error("Invalid stock")}
+router.post("/", asyncHandler(async (req, res) => {
+  const stockData = req.body;
+  if (!stockData.ticker || !stockData.qty || !stockData.avgPrice) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
 
-    const tickerResult = tickerData["bestMatches"].filter(m=>m["4. region"]?.includes("India") && m["2. name"]?.toLowerCase().includes(keyword.toLowerCase()))
-    if(!tickerResult.length){throw new Error("Stock not listed in India")}
+  stockData.ticker = stockData.ticker.toUpperCase();
 
-    stockData.ticker = tickerResult[0]["1. symbol"].toUpperCase();
-    stockData.companyName = tickerResult[0]["2. name"];
-
-    await sleep(1000);
-
+  // Optionally fetch CMP if missing
+  if (!stockData.cmp) {
     const cmpResponse = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockData.ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
     const cmpData = await cmpResponse.json();
     stockData.cmp = toPositiveNumber(cmpData["Global Quote"]?.["05. price"]);
@@ -94,23 +93,38 @@ router.delete("/:id", async (req, res) => {
 });
  
 // GET /api/stocks/pl  — P&L summary per holding
-router.get("/pl", async (req, res) => {
-  try {
-    const stocks = await Stock.find({ userId: USER });
-    const pl = stocks.map(s => ({
-      ticker:         s.ticker,
-      qty:            s.qty,
-      avgPrice:       s.avgPrice,
-      cmp:            s.cmp,
-      investedValue:  s.investedValue,
-      currentValue:   s.currentValue,
-      pl:             s.pl,
-      plPct:          s.plPct,
-    }));
-    const totalInvested = pl.reduce((a, b) => a + b.investedValue, 0);
-    const totalCurrent  = pl.reduce((a, b) => a + b.currentValue,  0);
-    res.json({ holdings: pl, totalInvested, totalCurrent, totalPL: totalCurrent - totalInvested });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
- 
+router.get("/pl", asyncHandler(async (req, res) => {
+  const stocks = await Stock.find({ userId: req.user.id });
+  const pl = stocks.map(s => ({
+    ticker:         s.ticker,
+    qty:            s.qty,
+    avgPrice:       s.avgPrice,
+    cmp:            s.cmp || s.avgPrice,
+    invested:       s.qty * s.avgPrice,
+    currentValue:   s.qty * (s.cmp || s.avgPrice),
+    pl:             (s.qty * (s.cmp || s.avgPrice)) - (s.qty * s.avgPrice),
+  }));
+
+  const totalInvested = pl.reduce((s, x) => s + x.invested, 0);
+  const totalCurrent  = pl.reduce((s, x) => s + x.currentValue, 0);
+  res.json({ holdings: pl, totalInvested, totalCurrent, totalPL: totalCurrent - totalInvested });
+}));
+
+// POST /api/stocks/sync — manual sync
+router.post("/sync", asyncHandler(async (req, res) => {
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const stocks = await Stock.find({ userId: req.user.id });
+  for (const stk of stocks) {
+    const cmpResponse = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stk.ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
+    const cmpData = await cmpResponse.json();
+    const latestPrice = Number(cmpData["Global Quote"]?.["05. price"]);
+    if (!Number.isNaN(latestPrice) && latestPrice > 0) {
+      stk.cmp = latestPrice;
+      await stk.save();
+    }
+    await sleep(15000); // 15s to respect AlphaVantage limit
+  }
+  res.json({ message: "Sync complete" });
+}));
+
 module.exports = router;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  getStocks, createStock, deleteStock, updateCMP,
+  getStocks, createStock, deleteStock, updateCMP, syncStocks,
   getMF, createMF, deleteMF,
   getFDs, createFD, deleteFD,
   getLiquid, updateLiquid,
@@ -57,6 +57,18 @@ function StocksTab({ C }) {
     finally { setLoading(false); }
   };
   useEffect(() => { load(); }, []);
+
+  const handleSync = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await syncStocks();
+      await load();
+    } catch (e) {
+      setError(e.response?.data?.error || "Sync failed");
+      setSaving(false);
+    }
+  };
 
   const add = async (vals) => {
     if (!vals.ticker || !vals.qty || !vals.avgPrice) return;

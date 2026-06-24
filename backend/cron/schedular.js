@@ -15,11 +15,11 @@ cron.schedule('35 15 * * *',async ()=>{
             const cmpData = await cmpResponse.json();
             const latestPrice = Number(cmpData["Global Quote"]?.["05. price"]);
 
-            if (!Number.isNaN(latestPrice) && latestPrice > 0) {
+            if(!Number.isNaN(latestPrice) && latestPrice >0){
                 stk.cmp = latestPrice;
                 await stk.save();
             }
-            await sleep(1000);
+            await sleep(15000); // 15s to respect AlphaVantage 5 requests/minute limit
         }
         for (const stk of stocks) {
             if (priceMap[stk.ticker]) {

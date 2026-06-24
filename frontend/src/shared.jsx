@@ -35,19 +35,30 @@ export const themes = {
 
 
 // ── Formatters ────────────────────────────────────────────────────────────────
-export const fmt = (n) =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency", currency: "INR", maximumFractionDigits: 0,
+export const getCurrency = () => localStorage.getItem("currency") || "INR";
+
+export const fmt = (n) => {
+  const currency = getCurrency();
+  const locale = currency === "INR" ? "en-IN" : "en-US";
+  return new Intl.NumberFormat(locale, {
+    style: "currency", currency: currency, maximumFractionDigits: 0,
   }).format(n);
+};
 
 export const pct = (v, t) => (t === 0 ? "0.0" : ((v / t) * 100).toFixed(1));
 
 export const fmtLakh = (n) => {
+  const currency = getCurrency();
+  const symbol = currency === "INR" ? "₹" : (currency === "USD" ? "$" : currency + " ");
   const abs = Math.abs(n);
-  if (abs >= 10000000) return `₹${(n / 10000000).toFixed(2)}Cr`;
-  if (abs >= 100000)   return `₹${(n / 100000).toFixed(2)}L`;
-  if (abs >= 1000)     return `₹${(n / 1000).toFixed(1)}k`;
-  return `₹${Math.round(n)}`;
+  if (currency === "INR") {
+    if (abs >= 10000000) return `${symbol}${(n / 10000000).toFixed(2)}Cr`;
+    if (abs >= 100000)   return `${symbol}${(n / 100000).toFixed(2)}L`;
+  } else {
+    if (abs >= 1000000)  return `${symbol}${(n / 1000000).toFixed(2)}M`;
+  }
+  if (abs >= 1000)     return `${symbol}${(n / 1000).toFixed(1)}k`;
+  return `${symbol}${Math.round(n)}`;
 };
 
 // ── Shared UI Atoms ───────────────────────────────────────────────────────────

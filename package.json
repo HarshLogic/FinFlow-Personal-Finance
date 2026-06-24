@@ -1,0 +1,24 @@
+{
+  "name": "finflow-personal-finance",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend start\"",
+    "install:all": "npm install && npm --prefix backend install && npm --prefix frontend install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cyberclutch146/FinFlow-Personal-Finance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cyberclutch146/FinFlow-Personal-Finance/issues"
+  },
+  "homepage": "https://github.com/Cyberclutch146/FinFlow-Personal-Finance#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
