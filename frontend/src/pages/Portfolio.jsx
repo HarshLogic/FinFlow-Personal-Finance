@@ -5,16 +5,20 @@ import {
   getFDs, createFD, deleteFD,
   getLiquid, updateLiquid,
 } from "../api";
-import { C, fmt, MetricCard, SectionTitle, Pill, Spinner, ErrorBox } from "../shared";
+import { fmt, MetricCard, SectionTitle, Pill, Spinner, ErrorBox } from "../shared";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function fdCalc(fd) {
   const n   = fd.tenure / 12;
-  const mat = Math.round(fd.principal * Math.pow(1 + fd.rate / 100, n));
+  const compoundsPerYear = 4;
+  const mat = Math.round(
+    fd.principal *
+      Math.pow(1 + fd.rate / (100 * compoundsPerYear), compoundsPerYear * n),
+  );
   return { mat, int: mat - fd.principal };
 }
 
-function AddRow({ fields, onAdd, saving }) {
+function AddRow({ fields, onAdd, saving, C }) {
   const [vals, setVals] = useState(() => Object.fromEntries(fields.map(f => [f.key, f.default ?? ""])));
   const set = (k, v) => setVals(p => ({ ...p, [k]: v }));
   return (
@@ -31,7 +35,7 @@ function AddRow({ fields, onAdd, saving }) {
       ))}
       <button onClick={() => { onAdd(vals); setVals(Object.fromEntries(fields.map(f => [f.key, f.default ?? ""]))); }}
         disabled={saving}
-        style={{ padding: "8px 18px", background: saving ? C.goldDim : C.gold, color: "#0D0F14", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: saving ? "not-allowed" : "pointer" }}>
+        style={{ padding: "8px 18px", background: saving ? C.gold + "88" : C.gold, color: "#0D0F14", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: saving ? "not-allowed" : "pointer" }}>
         {saving ? "…" : "+ Add"}
       </button>
     </div>
@@ -39,7 +43,7 @@ function AddRow({ fields, onAdd, saving }) {
 }
 
 // ── Stocks Tab ────────────────────────────────────────────────────────────────
-function StocksTab() {
+function StocksTab({ C }) {
   const [stocks,  setStocks]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
@@ -86,9 +90,13 @@ function StocksTab() {
   };
 
   const saveCMP = async (id, cmp) => {
-    if (!cmp || isNaN(cmp)) return;
+    const cmpValue = Number(cmp);
+    if (!Number.isFinite(cmpValue) || cmpValue <= 0) {
+      setError("CMP must be a positive number");
+      return;
+    }
     try {
-      const { data } = await updateCMP(id, Number(cmp));
+      const { data } = await updateCMP(id, cmpValue);
       setStocks(p => p.map(s => s._id === id ? data : s));
       setCmpEdit(p => { const n = { ...p }; delete n[id]; return n; });
     } catch (e) { setError("CMP update failed"); }
@@ -98,27 +106,22 @@ function StocksTab() {
   const stockCost = stocks.reduce((s, st) => s + st.qty * st.avgPrice,   0);
   const stockPL   = stockVal - stockCost;
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner C={C} />;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {error && <ErrorBox message={error} onRetry={load} />}
+      {error && <ErrorBox C={C} message={error} onRetry={load} />}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="📈" label="Stock Value"    value={fmt(stockVal)}  />
-        <MetricCard icon="💵" label="Invested"        value={fmt(stockCost)} />
-        <MetricCard icon="🎯" label="Total P&L"       value={fmt(stockPL)}
+        <MetricCard C={C} icon="📈" label="Stock Value"    value={fmt(stockVal)}  />
+        <MetricCard C={C} icon="💵" label="Invested"        value={fmt(stockCost)} />
+        <MetricCard C={C} icon="🎯" label="Total P&L"       value={fmt(stockPL)}
           subColor={stockPL >= 0 ? C.green : C.red}
           sub={`${stockPL >= 0 ? "+" : ""}${stockCost ? ((stockPL / stockCost) * 100).toFixed(2) : 0}%`} />
       </div>
 
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <SectionTitle>Add Stock</SectionTitle>
-          <button onClick={handleSync} disabled={saving} style={{ padding: "6px 12px", background: C.surface, color: C.text, border: `1px solid ${C.border}`, borderRadius: 8, cursor: saving ? "not-allowed" : "pointer", fontSize: 12 }}>
-            {saving ? "Syncing..." : "🔄 Sync Prices"}
-          </button>
-        </div>
-        <AddRow saving={saving} onAdd={add} fields={[
+        <SectionTitle C={C}>Add Stock</SectionTitle>
+        <AddRow C={C} saving={saving} onAdd={add} fields={[
           { key: "ticker",   placeholder: "TICKER", width: 90 },
           { key: "qty",      placeholder: "Qty",    type: "number", width: 70 },
           { key: "avgPrice", placeholder: "Avg ₹",  type: "number", width: 100 },
@@ -143,7 +146,7 @@ function StocksTab() {
                 return (
                   <tr key={st._id} style={{ borderBottom: `1px solid ${C.border}22` }}>
                     <td style={{ padding: "11px 10px", color: C.gold, fontWeight: 700 }}>{st.ticker}</td>
-                    <td style={{ padding: "11px 10px" }}><Pill color={C.blue}>{st.sector}</Pill></td>
+                    <td style={{ padding: "11px 10px" }}><Pill C={C} color={C.blue}>{st.sector}</Pill></td>
                     <td style={{ padding: "11px 10px", color: C.text }}>{st.qty}</td>
                     <td style={{ padding: "11px 10px", fontFamily: "monospace" }}>₹{st.avgPrice?.toLocaleString()}</td>
                     <td style={{ padding: "6px 10px" }}>
@@ -151,6 +154,8 @@ function StocksTab() {
                         <div style={{ display: "flex", gap: 4 }}>
                           <input type="number" value={cmpEdit[st._id]}
                             onChange={e => setCmpEdit(p => ({ ...p, [st._id]: e.target.value }))}
+                            min="0.01"
+                            step="0.01"
                             style={{ width: 80, padding: "4px 8px", background: C.surface, border: `1px solid ${C.gold}`, borderRadius: 6, color: C.text, fontSize: 12 }} />
                           <button onClick={() => saveCMP(st._id, cmpEdit[st._id])}
                             style={{ background: C.gold, color: "#0D0F14", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>✓</button>
@@ -185,7 +190,7 @@ function StocksTab() {
 }
 
 // ── Mutual Funds Tab ──────────────────────────────────────────────────────────
-function MFTab() {
+function MFTab({ C }) {
   const [funds,   setFunds]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
@@ -224,22 +229,22 @@ function MFTab() {
   const mfCost = funds.reduce((s, m) => s + m.invested, 0);
   const mfPL   = mfVal - mfCost;
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner C={C} />;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {error && <ErrorBox message={error} onRetry={load} />}
+      {error && <ErrorBox C={C} message={error} onRetry={load} />}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="🔵" label="MF Value"   value={fmt(mfVal)} />
-        <MetricCard icon="💵" label="Invested"    value={fmt(mfCost)} />
-        <MetricCard icon="📈" label="Returns"     value={fmt(mfPL)}
+        <MetricCard C={C} icon="🔵" label="MF Value"   value={fmt(mfVal)} />
+        <MetricCard C={C} icon="💵" label="Invested"    value={fmt(mfCost)} />
+        <MetricCard C={C} icon="📈" label="Returns"     value={fmt(mfPL)}
           subColor={mfPL >= 0 ? C.green : C.red}
           sub={`${mfPL >= 0 ? "+" : ""}${mfCost ? ((mfPL / mfCost) * 100).toFixed(2) : 0}%`} />
       </div>
 
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Add Mutual Fund</SectionTitle>
-        <AddRow saving={saving} onAdd={add} fields={[
+        <SectionTitle C={C}>Add Mutual Fund</SectionTitle>
+        <AddRow C={C} saving={saving} onAdd={add} fields={[
           { key: "name",     placeholder: "Fund Name",    width: 180 },
           { key: "type",     options: ["Equity","Debt","Hybrid","Index","ELSS"], default: "Equity" },
           { key: "invested", placeholder: "Invested ₹",  type: "number", width: 110 },
@@ -254,10 +259,10 @@ function MFTab() {
             const pl  = cv - m.invested;
             const plP = m.invested ? ((pl / m.invested) * 100).toFixed(2) : "0.00";
             return (
-              <div key={m._id} style={{ background: C.accent, borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              <div key={m._id} style={{ background: C.surface, borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{m.name}</div>
-                  <Pill color={m.type === "Equity" ? C.purple : C.blue}>{m.type}</Pill>
+                  <Pill C={C} color={m.type === "Equity" ? C.purple : C.blue}>{m.type}</Pill>
                 </div>
                 <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
                   {[["Invested", fmt(m.invested), C.muted], ["Current", fmt(cv), C.text], ["Return", `${pl >= 0 ? "+" : ""}${plP}%`, pl >= 0 ? C.green : C.red]].map(([l, v, c]) => (
@@ -279,7 +284,7 @@ function MFTab() {
 }
 
 // ── FD Tab ────────────────────────────────────────────────────────────────────
-function FDTab() {
+function FDTab({ C }) {
   const [fds,     setFDs]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
@@ -315,20 +320,20 @@ function FDTab() {
   const fdMV  = fds.reduce((s, f) => s + fdCalc(f).mat, 0);
   const fdInt = fds.reduce((s, f) => s + fdCalc(f).int, 0);
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner C={C} />;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {error && <ErrorBox message={error} onRetry={load} />}
+      {error && <ErrorBox C={C} message={error} onRetry={load} />}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="🏛️" label="Maturity Value" value={fmt(fdMV)} />
-        <MetricCard icon="✨" label="Interest Earned" value={fmt(fdInt)} subColor={C.gold} />
-        <MetricCard icon="📄" label="Active FDs"      value={fds.length} />
+        <MetricCard C={C} icon="🏛️" label="Maturity Value" value={fmt(fdMV)} />
+        <MetricCard C={C} icon="✨" label="Interest Earned" value={fmt(fdInt)} subColor={C.gold} />
+        <MetricCard C={C} icon="📄" label="Active FDs"      value={fds.length} />
       </div>
 
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Add Fixed Deposit</SectionTitle>
-        <AddRow saving={saving} onAdd={add} fields={[
+        <SectionTitle C={C}>Add Fixed Deposit</SectionTitle>
+        <AddRow C={C} saving={saving} onAdd={add} fields={[
           { key: "bank",      placeholder: "Bank Name",  width: 120 },
           { key: "principal", placeholder: "Principal ₹", type: "number", width: 120 },
           { key: "rate",      placeholder: "Rate % p.a.", type: "number", width: 100 },
@@ -344,7 +349,7 @@ function FDTab() {
             const end     = new Date(start); end.setMonth(end.getMonth() + fd.tenure);
             const progress = Math.min(((Date.now() - start) / (end - start)) * 100, 100);
             return (
-              <div key={fd._id} style={{ background: C.accent, borderRadius: 12, padding: 16 }}>
+              <div key={fd._id} style={{ background: C.surface, borderRadius: 12, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{fd.bank} FD</div>
@@ -383,7 +388,7 @@ function FDTab() {
 }
 
 // ── Liquid Tab ────────────────────────────────────────────────────────────────
-function LiquidTab() {
+function LiquidTab({ C }) {
   const [balance,  setBalance]  = useState(0);
   const [input,    setInput]    = useState("");
   const [loading,  setLoading]  = useState(true);
@@ -410,12 +415,12 @@ function LiquidTab() {
     finally { setSaving(false); }
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner C={C} />;
 
   return (
     <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 28, maxWidth: 480 }}>
-      {error && <ErrorBox message={error} />}
-      <SectionTitle>Liquid Cash Balance</SectionTitle>
+      {error && <ErrorBox C={C} message={error} />}
+       <SectionTitle C={C}>Liquid Cash Balance</SectionTitle>
       <div style={{ fontSize: 42, fontWeight: 800, color: C.text, fontFamily: "monospace", letterSpacing: "-1.5px", marginBottom: 6 }}>
         {fmt(balance)}
       </div>
@@ -426,7 +431,7 @@ function LiquidTab() {
           onKeyDown={e => e.key === "Enter" && save()}
           style={{ flex: 1, padding: "10px 14px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 9, color: C.text, fontSize: 14, outline: "none" }} />
         <button onClick={save} disabled={saving}
-          style={{ padding: "10px 22px", background: saving ? C.goldDim : C.gold, color: "#0D0F14", border: "none", borderRadius: 9, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
+          style={{ padding: "10px 22px", background: saving ? C.gold + "88" : C.gold, color: "#0D0F14", border: "none", borderRadius: 9, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
           {saving ? "…" : success ? "✓ Saved" : "Update"}
         </button>
       </div>
@@ -437,7 +442,7 @@ function LiquidTab() {
 // ── Portfolio Shell ───────────────────────────────────────────────────────────
 const TABS = [["stocks","Stocks"], ["mf","Mutual Funds"], ["fds","Fixed Deposits"], ["liquid","Liquid Cash"]];
 
-export default function Portfolio() {
+export default function Portfolio({ C }) {
   const [tab, setTab] = useState("stocks");
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -451,10 +456,10 @@ export default function Portfolio() {
           </button>
         ))}
       </div>
-      {tab === "stocks" && <StocksTab />}
-      {tab === "mf"     && <MFTab />}
-      {tab === "fds"    && <FDTab />}
-      {tab === "liquid" && <LiquidTab />}
+      {tab === "stocks" && <StocksTab C={C} />}
+      {tab === "mf"     && <MFTab C={C} />}
+      {tab === "fds"    && <FDTab C={C} />}
+      {tab === "liquid" && <LiquidTab C={C} />}
     </div>
   );
 }

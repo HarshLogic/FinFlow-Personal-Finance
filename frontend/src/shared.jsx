@@ -1,19 +1,38 @@
-// ── Design Tokens ─────────────────────────────────────────────────────────────
-export const C = {
-  bg:      "#0D0F14",
-  surface: "#13161D",
-  card:    "#181C26",
-  border:  "#232840",
-  gold:    "#D4A843",
-  goldDim: "#8A6C28",
-  green:   "#22C55E",
-  red:     "#EF4444",
-  blue:    "#60A5FA",
-  purple:  "#A78BFA",
-  text:    "#F1F0EC",
-  muted:   "#7A7F93",
-  accent:  "#1A2035",
+// ── Design Tokens ─
+ export const common = {
+  gold:"#D4A843",
+  goldDim:"#B88925",
+  green:"#22C55E",
+  red:"#EF4444",
+  blue:"#60A5FA",
+  purple:"#A78BFA",
 };
+
+export const themes = {
+  dark: {
+    bg: "#0D0F14",
+    surface: "#13161D",
+    card: "#181C26",
+    border: "#232840",
+    text: "#F1F0EC",
+    muted: "#7A7F93",
+    accent: "#13161D",
+    ...common,
+  },
+
+  light: {
+    bg: "#F5F5F5",
+    surface: "#FFFFFF",
+    card: "#FFFFFF",
+    border: "#D1D5DB",
+    text: "#111827",
+    muted: "#6B7280",
+    accent: "#F3F4F6",
+    ...common,
+  }
+};
+
+
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 export const getCurrency = () => localStorage.getItem("currency") || "INR";
@@ -43,11 +62,13 @@ export const fmtLakh = (n) => {
 };
 
 // ── Shared UI Atoms ───────────────────────────────────────────────────────────
-export function Pill({ children, color = C.gold }) {
+export function Pill({C, children, color }) {
+    const pillColor = color || C.gold;
+
   return (
     <span style={{
-      background: color + "22", color,
-      border: `1px solid ${color}44`,
+      background: pillColor + "22", color: pillColor,
+      border: `1px solid ${pillColor}44`,
       fontSize: 11, padding: "2px 8px",
       borderRadius: 20, fontWeight: 600,
       letterSpacing: "0.05em", textTransform: "uppercase",
@@ -55,18 +76,21 @@ export function Pill({ children, color = C.gold }) {
   );
 }
 
-export function MetricCard({ label, value, sub, subColor, icon }) {
+export function MetricCard({ C,label, value, sub, subColor, icon }) {
   return (
     <div style={{
       background: C.card, border: `1px solid ${C.border}`,
       borderRadius: 14, padding: "18px 20px",
       display: "flex", flexDirection: "column", gap: 6,
-      flex: 1, minWidth: 155,
+      flex: 1,
+      minWidth: 0,
+      width: "100%",
+      transition: "all 0.3s ease",
     }}>
       <div style={{ fontSize: 12, color: C.muted, display: "flex", alignItems: "center", gap: 6 }}>
         {icon && <span style={{ fontSize: 14 }}>{icon}</span>} {label}
       </div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: C.text, fontFamily: "monospace", letterSpacing: "-0.5px" }}>
+      <div style={{ fontSize: "clamp(16px, 4vw, 22px)",wordBreak: "break-word",overflowWrap: "anywhere",  fontWeight: 700, color: C.text, fontFamily: "monospace", letterSpacing: "-0.5px" }}>
         {value}
       </div>
       {sub && <div style={{ fontSize: 12, color: subColor || C.muted }}>{sub}</div>}
@@ -74,7 +98,7 @@ export function MetricCard({ label, value, sub, subColor, icon }) {
   );
 }
 
-export function SectionTitle({ children }) {
+export function SectionTitle({ C, children }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
       <div style={{ width: 3, height: 18, background: C.gold, borderRadius: 4 }} />
@@ -85,7 +109,7 @@ export function SectionTitle({ children }) {
   );
 }
 
-export function Spinner() {
+export function Spinner({ C }) {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 48 }}>
       <div style={{
@@ -99,7 +123,7 @@ export function Spinner() {
   );
 }
 
-export function ErrorBox({ message, onRetry }) {
+export function ErrorBox({ C, message, onRetry }) {
   return (
     <div style={{
       background: "#EF444422", border: `1px solid #EF444466`,

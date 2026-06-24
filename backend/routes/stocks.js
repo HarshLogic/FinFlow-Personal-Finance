@@ -5,7 +5,10 @@ const auth = require("../middleware/auth");
 
 dotenv.config();
 
-router.use(auth);
+const toPositiveNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) && num > 0 ? num : null;
+};
 
 router.get("/", async (req, res) => {
   try {
@@ -32,40 +35,63 @@ router.post("/", asyncHandler(async (req, res) => {
   if (!stockData.cmp) {
     const cmpResponse = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockData.ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
     const cmpData = await cmpResponse.json();
-    if (cmpData && cmpData["Global Quote"] && cmpData["Global Quote"]["05. price"]) {
-      stockData.cmp = Number(cmpData["Global Quote"]["05. price"]);
+    stockData.cmp = toPositiveNumber(cmpData["Global Quote"]?.["05. price"]);
+    if (stockData.cmp === null) {
+      throw new Error("Unable to fetch a valid stock price");
     }
-  }
+    
+    const stock = await Stock.create({ ...stockData, userId: USER });
+    res.status(201).json(stock);
 
-  const stock = await Stock.create({ ...stockData, userId: req.user.id });
-  res.status(201).json(stock);
-}));
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+ 
+router.put("/:id", async (req, res) => {
+  try {
+    const updateData = { ...req.body };
 
-router.put("/:id", asyncHandler(async (req, res) => {
-  const stock = await Stock.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user.id }, req.body,
-    { new: true, runValidators: true }
-  );
-  if (!stock) return res.status(404).json({ error: "Not found" });
-  res.json(stock);
-}));
+    if (updateData.cmp !== undefined) {
+      const cmpValue = toPositiveNumber(updateData.cmp);
+      if (cmpValue === null) {
+        return res.status(400).json({ error: "CMP must be a positive number" });
+      }
+      updateData.cmp = cmpValue;
+    }
 
-router.patch("/:id/cmp", asyncHandler(async (req, res) => {
-  const { cmp } = req.body;
-  const stock = await Stock.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user.id },
-    { cmp },
-    { new: true }
-  );
-  if (!stock) return res.status(404).json({ error: "Not found" });
-  res.json(stock);
-}));
+    const stock = await Stock.findOneAndUpdate(
+      { _id: req.params.id, userId: USER }, updateData,
+      { new: true, runValidators: true }
+    );
+    if (!stock) return res.status(404).json({ error: "Not found" });
+    res.json(stock);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+ 
+// PATCH /api/stocks/:id/cmp  — update live price
+router.patch("/:id/cmp", async (req, res) => {
+  try {
+    const cmpValue = toPositiveNumber(req.body.cmp);
+    if (cmpValue === null) {
+      return res.status(400).json({ error: "CMP must be a positive number" });
+    }
 
-router.delete("/:id", asyncHandler(async (req, res) => {
-  await Stock.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
-  res.json({ message: "Deleted" });
-}));
-
+    const stock = await Stock.findOneAndUpdate(
+      { _id: req.params.id, userId: USER },
+      { cmp: cmpValue },
+      { new: true, runValidators: true }
+    );
+    if (!stock) return res.status(404).json({ error: "Not found" });
+    res.json(stock);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+ 
+router.delete("/:id", async (req, res) => {
+  try {
+    await Stock.findOneAndDelete({ _id: req.params.id, userId: USER });
+    res.json({ message: "Deleted" });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+ 
 // GET /api/stocks/pl  — P&L summary per holding
 router.get("/pl", asyncHandler(async (req, res) => {
   const stocks = await Stock.find({ userId: req.user.id });

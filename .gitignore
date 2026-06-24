@@ -8,3 +8,5 @@ frontend/build/
 .env
 frontend/.env
 backend/.env
+.vercel
+.env*
