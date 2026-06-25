@@ -325,7 +325,13 @@ cd backend && npm run dev      # ✅ FinFlow API running on port 5000
 cd frontend && npm run dev     # → http://localhost:5173
 ```
 
-### 4 — Verify
+### 4 — Run tests (Backend)
+
+```bash
+cd backend && npm test
+```
+
+### 5 — Verify
 
 | Check | URL |
 |-------|-----|

@@ -2,8 +2,13 @@ const express  = require("express");
 const mongoose = require("mongoose");
 const cors     = require("cors");
 const dotenv   = require("dotenv");
+const path     = require("path");
  
-dotenv.config();
+if (process.env.NODE_ENV === "test") {
+  dotenv.config({ path: path.resolve(__dirname, ".env.test") });
+} else {
+  dotenv.config();
+}
  
 const app = express();
  
@@ -49,15 +54,17 @@ app.use("/api/summary",     require("./routes/summary"));
 app.get("/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
  
 // ── DB + Server ───────────────────────────────────────────────────────────────
-mongoose
-  .connect(process.env.MONGO_URI, { dbName: "finflow" })
-  .then(() => {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`✅  FinFlow API running on port ${PORT}`);
-      require("./cron/schedular");
-    });
-  })
-  .catch(err => { console.error("❌  MongoDB connection failed:", err); process.exit(1); });
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(process.env.MONGO_URI, { dbName: "finflow" })
+    .then(() => {
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`✅  FinFlow API running on port ${PORT}`);
+        require("./cron/schedular");
+      });
+    })
+    .catch(err => { console.error("❌  MongoDB connection failed:", err); process.exit(1); });
+}
  
 module.exports = app;
