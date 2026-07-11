@@ -43,7 +43,7 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
 | 📱 Mobile Responsive UI | 🔜 Planned | Sidebar collapses, touch-friendly forms |
 | 📤 Export to CSV / PDF | 🔜 Planned | Download expense reports and portfolio snapshot |
-| 🌙 Light Mode Toggle | 🔜 Planned | Currently dark-only |
+| 🌙 Light Mode Toggle | ✅ Complete | Currently dark-only |
 
 ---
 
