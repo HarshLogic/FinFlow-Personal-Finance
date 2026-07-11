@@ -41,7 +41,7 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 👤 User Profiles | 🔄 In Progress | Per-user data isolation |
 | 📬 Monthly Budget Alerts | 🔜 Planned | Email alert when spend exceeds budget |
 | 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
-| 📱 Mobile Responsive UI | 🔜 Planned | Sidebar collapses, touch-friendly forms |
+| 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly forms |
 | 📤 Export to CSV / PDF | 🔜 Planned | Download expense reports and portfolio snapshot |
 | 🌙 Light Mode Toggle | ✅ Complete | Currently dark-only |
 
