@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const { Stock } = require("../models");
 const dotenv = require("dotenv");
-const USER = "demo_user";
 dotenv.config();
 
 const toPositiveNumber = (value) => {
@@ -11,6 +10,7 @@ const toPositiveNumber = (value) => {
 
 router.get("/", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     const stocks = await Stock.find({ userId: USER }).sort({ ticker: 1 });
     res.json(stocks);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
  
 router.post("/", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     var stockData = {...req.body};
     const keyword = stockData.ticker;
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -49,6 +50,7 @@ router.post("/", async (req, res) => {
  
 router.put("/:id", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     const updateData = { ...req.body };
 
     if (updateData.cmp !== undefined) {
@@ -71,6 +73,7 @@ router.put("/:id", async (req, res) => {
 // PATCH /api/stocks/:id/cmp  — update live price
 router.patch("/:id/cmp", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     const cmpValue = toPositiveNumber(req.body.cmp);
     if (cmpValue === null) {
       return res.status(400).json({ error: "CMP must be a positive number" });
@@ -88,6 +91,7 @@ router.patch("/:id/cmp", async (req, res) => {
  
 router.delete("/:id", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     await Stock.findOneAndDelete({ _id: req.params.id, userId: USER });
     res.json({ message: "Deleted" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -96,6 +100,7 @@ router.delete("/:id", async (req, res) => {
 // GET /api/stocks/pl  — P&L summary per holding
 router.get("/pl", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
     const stocks = await Stock.find({ userId: USER });
     const pl = stocks.map(s => ({
       ticker:         s.ticker,

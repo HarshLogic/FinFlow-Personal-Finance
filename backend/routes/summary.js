@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const { Stock, MutualFund, FixedDeposit, Liquid, Expense } = require("../models");
-const USER = "demo_user";
  
-// GET /api/summary  — Full portfolio snapshot
 router.get("/", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Scoped inside the route
+
     const [stocks, mfs, fds, liquid, expenses] = await Promise.all([
       Stock.find({ userId: USER }),
       MutualFund.find({ userId: USER }),
@@ -66,6 +66,7 @@ router.get("/", async (req, res) => {
 // GET /api/summary/projection?monthly=&rate=&years=
 router.get("/projection", (req, res) => {
   try {
+    // Note: The projection route does not touch the database, so it does not need a USER variable
     const monthly = Number(req.query.monthly) || 10000;
     const rate    = Number(req.query.rate)    || 12;      // annual %
     const years   = Number(req.query.years)   || 20;

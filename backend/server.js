@@ -2,7 +2,8 @@ const express  = require("express");
 const mongoose = require("mongoose");
 const cors     = require("cors");
 const dotenv   = require("dotenv");
- 
+const { clerkMiddleware, requireAuth } = require("@clerk/express"); 
+
 dotenv.config();
  
 const app = express();
@@ -10,15 +11,13 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  "https://fin-flow-personal-finance.vercel.app" // Your main production URL
+  "https://fin-flow-personal-finance.vercel.app" 
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // 1. Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
 
-    // 2. Allow if it's in our explicit list OR if it's a Vercel preview URL
     if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
@@ -29,6 +28,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+app.use(clerkMiddleware());
  
 // ── Routes ────────────────────────────────────────────────────────────────────
 const { mfRouter, fdRouter, liquidRouter } = require("./routes/portfolio");
@@ -38,12 +39,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/expenses",    require("./routes/expenses"));
-app.use("/api/stocks",      require("./routes/stocks"));
-app.use("/api/mutualfunds", mfRouter);
-app.use("/api/fds",         fdRouter);
-app.use("/api/liquid",      liquidRouter);
-app.use("/api/summary",     require("./routes/summary"));
+app.use("/api/expenses",    requireAuth(), require("./routes/expenses"));
+app.use("/api/stocks",      requireAuth(), require("./routes/stocks"));
+app.use("/api/mutualfunds", requireAuth(), mfRouter);
+app.use("/api/fds",         requireAuth(), fdRouter);
+app.use("/api/liquid",      requireAuth(), liquidRouter);
+app.use("/api/summary",     requireAuth(), require("./routes/summary"));
  
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));

@@ -1,9 +1,27 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #root { height: 100%; width: 100%; }
-body { background: #0D0F14; color: #F1F0EC; font-family: 'DM Sans', system-ui, sans-serif; }
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+html, body, #root { 
+  height: 100%; 
+  width: 100%; 
+  margin: 0;
+  padding: 0;
+  background-color: #0D0F14; 
+}
+
+body { 
+  color: #F1F0EC; 
+  font-family: 'DM Sans', system-ui, sans-serif; 
+}
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #13161D; }
 ::-webkit-scrollbar-thumb { background: #232840; border-radius: 3px; }
+
 input[type=range] { -webkit-appearance: none; height: 4px; background: #232840; border-radius: 2px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #D4A843; cursor: pointer; }
+
 select { appearance: none; }

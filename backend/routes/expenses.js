@@ -1,12 +1,11 @@
 const router   = require("express").Router();
 const { Expense } = require("../models");
  
-const USER = "demo_user"; // replace with JWT auth middleware later
- 
-// GET  /api/expenses  — list with optional filters
 router.get("/", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 Gets the secure User ID from Clerk
     const { type, category, from, to, page = 1, limit = 50 } = req.query;
+    
     const filter = { userId: USER };
     if (type)     filter.type     = type;
     if (category) filter.category = category;
@@ -27,6 +26,7 @@ router.get("/", async (req, res) => {
 // POST /api/expenses
 router.post("/", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 
     const expense = await Expense.create({ ...req.body, userId: USER });
     res.status(201).json(expense);
   } catch (e) { res.status(400).json({ error: e.message }); }
@@ -35,6 +35,7 @@ router.post("/", async (req, res) => {
 // PUT  /api/expenses/:id
 router.put("/:id", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 
     const expense = await Expense.findOneAndUpdate(
       { _id: req.params.id, userId: USER },
       req.body,
@@ -48,15 +49,17 @@ router.put("/:id", async (req, res) => {
 // DELETE /api/expenses/:id
 router.delete("/:id", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: USER });
     if (!expense) return res.status(404).json({ error: "Not found" });
     res.json({ message: "Deleted" });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
  
-// GET /api/expenses/analytics  — need vs want breakdown by month
+// GET /api/expenses/analytics
 router.get("/analytics", async (req, res) => {
   try {
+    const USER = req.auth.userId; // 👈 
     const agg = await Expense.aggregate([
       { $match: { userId: USER } },
       { $group: {

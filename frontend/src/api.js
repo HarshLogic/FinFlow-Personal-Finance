@@ -8,7 +8,7 @@ const BASE_URL =
   "https://finflow-personal-finance.onrender.com/api";
 
 // Axios instance
-const api = axios.create({
+export const api = axios.create({
   baseURL: BASE_URL,
 });
 
