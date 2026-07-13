@@ -132,7 +132,7 @@ export function SectionTitle({ C, children }) {
 
 export function Spinner({ C }) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 48 }}>
+    <div role="status" style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 48 }}>
       <div style={{
         width: 32, height: 32, borderRadius: "50%",
         border: `3px solid ${C.border}`,
