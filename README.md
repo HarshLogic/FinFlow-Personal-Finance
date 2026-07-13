@@ -37,8 +37,8 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 🏛️ Fixed Deposits | ✅ Complete | Maturity calc, progress bar |
 | 🏦 Liquid Cash | ✅ Complete | Balance update via API |
 | 📊 Wealth Projection | ✅ Complete | SIP formula, debounced sliders |
-| 🔐 Authentication | 🔄 In Progress | JWT login/signup — replacing `demo_user` hardcode |
-| 👤 User Profiles | 🔄 In Progress | Per-user data isolation |
+| 🔐 Authentication | ✅ Complete | JWT login/signup — replacing `demo_user` hardcode |
+| 👤 User Profiles | ✅ Complete | Per-user data isolation |
 | 📬 Monthly Budget Alerts | 🔜 Planned | Email alert when spend exceeds budget |
 | 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
 | 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly forms |
