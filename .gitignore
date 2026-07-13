@@ -8,3 +8,8 @@ frontend/build/
 .env
 frontend/.env
 backend/.env
+
+# Coverage
+coverage/
+frontend/coverage/
+backend/coverage/
