@@ -18,6 +18,7 @@ export const createExpense  = (data)   => api.post("/expenses", data);
 export const updateExpense  = (id, data) => api.put(`/expenses/${id}`, data);
 export const deleteExpense  = (id)     => api.delete(`/expenses/${id}`);
 export const getExpenseAnalytics = ()  => api.get("/expenses/analytics");
+export const exportExpenses = ()       => api.get("/expenses/export", { responseType: "blob" });
 
 // ── Stocks ────────────────────────────────────────────────────────────────────
 export const getStocks      = ()       => api.get("/stocks");
