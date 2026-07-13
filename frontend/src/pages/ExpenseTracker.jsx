@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getExpenses, createExpense, deleteExpense, exportExpenses } from "../api";
-import { C, fmt, MetricCard, SectionTitle, Pill, Spinner, ErrorBox, CAT_ICON, CATEGORIES } from "../shared";
+import { fmt, MetricCard, SectionTitle, Pill, Spinner, ErrorBox, CAT_ICON, CATEGORIES } from "../shared";
 
 const EMPTY = { date: "", category: "Food", label: "", amount: "", type: "need", notes: "" };
 
-export default function ExpenseTracker() {
+export default function ExpenseTracker({ C, currency  }) {
   const [expenses, setExpenses] = useState([]);
   const [form,     setForm]     = useState(EMPTY);
   const [filter,   setFilter]   = useState("all");
@@ -87,23 +87,23 @@ const handleExport = async () => {
     return { needSpend: needs, wantSpend: wants, catData: categories, filtered: filteredData };
   }, [expenses, filter]);
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner C={C}/>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {error && <ErrorBox message={error} onRetry={load} />}
+      {error && <ErrorBox C={C} message={error} onRetry={load} />}
 
       {/* Metrics */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="✅" label="Total Needs"   value={fmt(needSpend)}  subColor={C.green} sub="Essential expenses" />
-        <MetricCard icon="🎯" label="Total Wants"   value={fmt(wantSpend)}  subColor={C.gold}  sub="Lifestyle expenses" />
-        <MetricCard icon="📋" label="Total Entries" value={expenses.length}
+        <MetricCard C={C} icon="✅" label="Total Needs"   value={fmt(needSpend, currency)}  subColor={C.green} sub="Essential expenses" />
+        <MetricCard C={C} icon="🎯" label="Total Wants"   value={fmt(wantSpend, currency)}  subColor={C.gold}  sub="Lifestyle expenses" />
+        <MetricCard C={C} icon="📋" label="Total Entries" value={expenses.length}
           sub={`${expenses.filter(e => e.type === "need").length} needs · ${expenses.filter(e => e.type === "want").length} wants`} />
       </div>
 
       {/* Add Expense Form */}
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Add Expense</SectionTitle>
+        <SectionTitle C={C}>Add Expense</SectionTitle>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           {[
             { field: "date",   type: "date",   placeholder: "Date",        width: 145 },
@@ -152,14 +152,14 @@ const handleExport = async () => {
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         {/* Category Chart */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, flex: "1 1 300px" }}>
-          <SectionTitle>Spend by Category</SectionTitle>
+          <SectionTitle C={C}>Spend by Category</SectionTitle>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={catData} margin={{ left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
               <XAxis dataKey="name" tick={{ fill: C.muted, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: C.muted, fontSize: 11 }} axisLine={false} tickLine={false}
-                tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={v => fmt(v)}
+                tickFormatter={v => fmt(v, currency)} />
+              <Tooltip formatter={(value) => fmt(value, currency)}
                 contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text }} />
               <Bar dataKey="need" fill={C.green} radius={[4, 4, 0, 0]} name="Need" />
               <Bar dataKey="want" fill={C.gold}  radius={[4, 4, 0, 0]} name="Want" />
@@ -170,7 +170,7 @@ const handleExport = async () => {
         {/* Transaction List */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, flex: "1 1 300px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <SectionTitle>Transactions</SectionTitle>
+            <SectionTitle C={C}>Transactions</SectionTitle>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               
               {/* EXPORT BUTTON INTEGRATED HERE */}
@@ -209,7 +209,7 @@ const handleExport = async () => {
                   borderBottom: `1px solid ${C.border}`, gap: 10,
                 }}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: 10, background: C.accent,
+                    width: 36, height: 36, borderRadius: 10, background: C.surface,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 16, flexShrink: 0,
                   }}>
@@ -223,7 +223,7 @@ const handleExport = async () => {
                   </div>
                   <Pill color={e.type === "need" ? C.green : C.gold}>{e.type}</Pill>
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.text, fontFamily: "monospace", minWidth: 80, textAlign: "right" }}>
-                    {fmt(e.amount)}
+                    {fmt(e.amount, currency)}
                   </div>
                   <button onClick={() => del(e._id)}
                     style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 14, padding: "0 4px" }}>

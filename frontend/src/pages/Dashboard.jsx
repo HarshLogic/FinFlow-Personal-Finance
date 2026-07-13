@@ -4,10 +4,9 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { getSummary, getExpenseAnalytics } from "../api";
-import { C, fmt, pct, MetricCard, SectionTitle, Spinner, ErrorBox } from "../shared";
+import { fmt, pct, MetricCard, SectionTitle, Spinner, ErrorBox } from "../shared";
 
-export default function Dashboard() {
-  const [summary,   setSummary]   = useState(null);
+export default function Dashboard({ C, currency }) {  const [summary,   setSummary]   = useState(null);
   const [analytics, setAnalytics] = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
@@ -40,11 +39,15 @@ export default function Dashboard() {
     want:  d.want  || 0,
   }));
 
-  if (loading) return <Spinner />;
-  if (error)   return <ErrorBox message={error} onRetry={load} />;
+  if (loading) return <Spinner C={C}/>;
+  if (error)   return <ErrorBox C={C} message={error} onRetry={load} />;
   if (!summary) return null;
 
   const { summary: s, expenses } = summary;
+  console.log("Expenses:", expenses);
+console.log("Need:", expenses.needSpend);
+console.log("Want:", expenses.wantSpend);
+
   const { allocation } = s;
 
   const allocationData = [
@@ -57,20 +60,27 @@ export default function Dashboard() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Metrics */}
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="💰" label="Total Wealth"   value={fmt(s.totalWealth)}
-          sub={`P&L ${s.totalPL >= 0 ? "+" : ""}${fmt(s.totalPL)}`}
+      <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: 12, width: "100%",
+  }}
+>
+        <MetricCard C={C} icon="💰" label="Total Wealth"   value={fmt(s.totalWealth, currency)}
+          sub={`P&L ${s.totalPL >= 0 ? "+" : ""}${fmt(s.totalPL, currency)}`}
           subColor={s.totalPL >= 0 ? C.green : C.red} />
-        <MetricCard icon="📊" label="Total Invested" value={fmt(s.totalInvested)} sub="Across all assets" />
-        <MetricCard icon="💸" label="Month Spend"
-          value={fmt((expenses.needSpend || 0) + (expenses.wantSpend || 0))}
-          sub={`Needs ₹${Math.round((expenses.needSpend||0)/1000)}k · Wants ₹${Math.round((expenses.wantSpend||0)/1000)}k`} />
-        <MetricCard icon="🏦" label="Liquid Cash"    value={fmt(allocation.liquid.value)} sub="Available" />
+        <MetricCard C={C} icon="📊" label="Total Invested" value={fmt(s.totalInvested, currency)} sub="Across all assets" />
+        <MetricCard C={C} icon="💸" label="Month Spend"
+          value={fmt((expenses.needSpend || 0) + (expenses.wantSpend || 0), currency)}
+sub={`Needs ${fmt(expenses.needSpend || 0, currency)} · Wants ${fmt(expenses.wantSpend || 0, currency)}`}
+ />
+        <MetricCard C={C} icon="🏦" label="Liquid Cash"    value={fmt(allocation.liquid.value, currency)} sub="Available" />
       </div>
 
       {/* Flow Chart */}
       <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Monthly Expense Flow</SectionTitle>
+        <SectionTitle C={C}>Monthly Expense Flow</SectionTitle>
         {flowData.length === 0 ? (
           <div style={{ color: C.muted, fontSize: 13, textAlign: "center", padding: 32 }}>
             No expense data yet — add some transactions first.
@@ -90,9 +100,8 @@ export default function Dashboard() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
               <XAxis dataKey="month" tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: C.muted, fontSize: 11 }} axisLine={false} tickLine={false}
-                tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={v => fmt(v)}
+              <YAxis tickFormatter={v => fmt(v, currency)} />
+              <Tooltip formatter={(v) => fmt(v, currency)}
                 contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text }} />
               <Area type="monotone" dataKey="need"  stroke={C.green} fill="url(#gNeed)" strokeWidth={2} name="Needs" />
               <Area type="monotone" dataKey="want"  stroke={C.gold}  fill="url(#gWant)" strokeWidth={2} name="Wants" />
@@ -104,8 +113,8 @@ export default function Dashboard() {
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
         {/* Asset Allocation Donut */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, flex: 1, minWidth: 240 }}>
-          <SectionTitle>Asset Allocation</SectionTitle>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <SectionTitle C={C}>Asset Allocation</SectionTitle>
+          <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap:"wrap" }}>
             <ResponsiveContainer width={140} height={140}>
               <PieChart>
                 <Pie data={allocationData} dataKey="value" cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={3}>
@@ -129,7 +138,7 @@ export default function Dashboard() {
 
         {/* Needs vs Wants */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, flex: 1, minWidth: 240 }}>
-          <SectionTitle>This Month — Needs vs Wants</SectionTitle>
+          <SectionTitle C={C}>This Month — Needs vs Wants</SectionTitle>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               { label: "Needs", val: expenses.needSpend || 0, color: C.green },
@@ -140,7 +149,7 @@ export default function Dashboard() {
                 <div key={r.label}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                     <span style={{ fontSize: 12, color: C.muted }}>{r.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{fmt(r.val)}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{fmt(r.val, currency)}</span>
                   </div>
                   <div style={{ height: 8, background: C.border, borderRadius: 4, overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${pct(r.val, total)}%`, background: r.color, borderRadius: 4 }} />

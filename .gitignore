@@ -13,3 +13,5 @@ backend/.env
 coverage/
 frontend/coverage/
 backend/coverage/
+.vercel
+.env*

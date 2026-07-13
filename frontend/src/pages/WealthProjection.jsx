@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getProjection } from "../api";
-import { C, MetricCard, SectionTitle, Spinner, ErrorBox } from "../shared";
+import { MetricCard, SectionTitle, Spinner, ErrorBox } from "../shared";
 
-export default function WealthProjection() {
+export default function WealthProjection({ C }) {
   const [monthly, setMonthly] = useState(20000);
   const [rate,    setRate]    = useState(12);
   const [years,   setYears]   = useState(20);
@@ -11,6 +11,8 @@ export default function WealthProjection() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
+    
+  
 
 const load = useCallback(async () => {
   setLoading(true); 
@@ -62,25 +64,24 @@ const load = useCallback(async () => {
   const milestones = [5, 10, 15, 20].filter(y => y <= years);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%", padding: "10px", boxSizing: "border-box", }}>
       {/* Metrics */}
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <MetricCard icon="🚀" label="Projected Corpus" subColor={C.gold}
-          value={summary ? `₹${(summary.finalCorpus / 100000).toFixed(1)}L` : "—"}
-          sub={`In ${years} years`} />
-        <MetricCard icon="💵" label="Total Invested"
+        <div
+  style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, width: "100%",}}>
+       <MetricCard C={C} icon="🚀" label="Projected Corpus" subColor={C.gold} value={summary ? `₹${(summary.finalCorpus / 100000).toFixed(1)}L` : "—"} sub={`In ${years} years`} />
+        <MetricCard C={C} icon="💵" label="Total Invested"
           value={summary ? `₹${(summary.totalInvested / 100000).toFixed(1)}L` : "—"}
           sub={`₹${(monthly/1000).toFixed(0)}k/month`} />
-        <MetricCard icon="✨" label="Wealth Created" subColor={C.green}
+        <MetricCard C={C} icon="✨" label="Wealth Created" subColor={C.green}
           value={summary ? `₹${(summary.wealthCreated / 100000).toFixed(1)}L` : "—"}
           sub={summary ? `${summary.multiplier}× multiplier` : ""} />
       </div>
 
-      {error && <ErrorBox message={error} onRetry={load} />}
+      {error && <ErrorBox C={C} message={error} onRetry={load} />}
 
       {/* Sliders */}
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Projection Parameters</SectionTitle>
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: "clamp(12px, 3vw, 20px)" }}>
+        <SectionTitle C={C}>Projection Parameters</SectionTitle>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           {sliders.map(s => (
             <div key={s.key}>
@@ -103,11 +104,11 @@ const load = useCallback(async () => {
       </div>
 
       {/* Chart */}
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-        <SectionTitle>Wealth Growth Curve</SectionTitle>
-        {loading ? <Spinner /> : (
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: "clamp(12px, 3vw, 20px)", overflowX: "auto"}}>
+        <SectionTitle C={C}>Wealth Growth Curve</SectionTitle>
+        {loading ? <Spinner C={C} /> : (
           <>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={data} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gCorpus" x1="0" y1="0" x2="0" y2="1">
@@ -137,7 +138,7 @@ const load = useCallback(async () => {
               {milestones.map(y => {
                 const point = data.find(d => d.year === `Y${y}`);
                 return (
-                  <div key={y} style={{ background: C.accent, borderRadius: 10, padding: "10px 14px", flex: 1, minWidth: 110 }}>
+                  <div key={y} style={{ background: C.accent, borderRadius: 10, padding: "10px 14px", flex: "1 1 150px", minWidth: "120px", maxWidth: "100%" }}>
                     <div style={{ fontSize: 11, color: C.muted }}>At {y} years</div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: C.gold, fontFamily: "monospace" }}>
                       {point ? `₹${(point.corpus).toFixed(1)}L` : "—"}
