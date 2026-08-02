@@ -4,9 +4,11 @@ import Dashboard from "./pages/Dashboard";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import Portfolio from "./pages/Portfolio";
 import WealthProjection from "./pages/WealthProjection";
+import LandingPage from "./pages/LandingPage";
 import { themes, common } from "./shared";
 
-import { SignedIn, SignedOut, SignIn, UserButton } from "@clerk/clerk-react";
+// We use SignedIn and SignedOut directly from Clerk
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const NAV = [
   { id: "dashboard", icon: "⬡", label: "Dashboard" },
@@ -55,24 +57,12 @@ export default function App() {
 
   return (
     <>
-      {/* ── LOGGED OUT VIEW ── */}
+      {/* ── 1. LOGGED OUT VIEW: SHOWS YOUR LANDING PAGE ── */}
       <SignedOut>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-            background: C.bg,
-            fontFamily: "'DM Sans',system-ui,sans-serif",
-          }}
-        >
-          {/* The SignIn component automatically includes a link to switch to SignUp */}
-          <SignIn />
-        </div>
+        <LandingPage />
       </SignedOut>
 
-      {/* ── LOGGED IN VIEW ── */}
+      {/* ── 2. LOGGED IN VIEW: SHOWS YOUR EXISTING DASHBOARD ── */}
       <SignedIn>
         <div
           style={{
@@ -244,7 +234,7 @@ export default function App() {
                     background: C.card,
                     color: C.text,
                     cursor: "pointer",
-                    fontSize: 13,
+                    fontSize: "13px",
                   }}
                 >
                   <option value="INR">₹ INR</option>
@@ -260,7 +250,7 @@ export default function App() {
                     background: C.card,
                     color: C.text,
                     cursor: "pointer",
-                    fontSize: 13,
+                    fontSize: "13px",
                   }}
                 >
                   {theme === "dark" ? "☀ Light" : "🌙 Dark"}
@@ -277,7 +267,7 @@ export default function App() {
                 >
                   🟢 Live
                 </div>
-                {/* ── CLERK USER BUTTON REPLACES STATIC AVATAR ── */}
+                {/* ── CLERK USER BUTTON ── */}
                 <UserButton afterSignOutUrl="/" />
               </div>
             </header>
