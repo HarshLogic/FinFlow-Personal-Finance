@@ -39,11 +39,13 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 📊 Wealth Projection | ✅ Complete | SIP formula, debounced sliders |
 | 🔐 Authentication | ✅ Complete | JWT login/signup — replacing `demo_user` hardcode |
 | 👤 User Profiles | ✅ Complete | Per-user data isolation |
+| 🤖 Build AI Agent | 🔜 Planned | Build a Ai agent for FinFlow |
 | 📬 Monthly Budget Alerts | 🔜 Planned | Email alert when spend exceeds budget |
 | 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
 | 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly forms |
 | 📤 Export to CSV / PDF | ✅ Complete | Download expense reports and portfolio snapshot |
 | 🌙 Light Mode Toggle | ✅ Complete | Currently dark-only |
+| 📱 App | 🔜 Planned | App for FinFlow |
 
 ---
 
