@@ -140,12 +140,12 @@ const Hero = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            FinFlow 2.0 is Live
+            FinFlow
           </motion.div>
           
           <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-6">
-            Institutional power, <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">personal precision.</span>
+            Track smarter, <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Invest better.</span>
           </motion.h1>
           
           <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-400 mb-10 leading-relaxed font-light">
