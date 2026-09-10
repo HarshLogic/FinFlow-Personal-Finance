@@ -338,6 +338,24 @@ cd frontend && npm run dev     # → http://localhost:5173
 
 ---
 
+## 🧪 Testing
+
+### Frontend Tests
+The frontend application uses Jest and React Testing Library to test component rendering and integration.
+
+To run frontend tests interactively in watch mode:
+```bash
+cd frontend && npm test
+```
+
+To run frontend tests once (e.g., in CI environments):
+```bash
+cd frontend && CI=true npm test
+```
+
+---
+
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology | Version |
