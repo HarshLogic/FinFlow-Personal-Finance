@@ -13,10 +13,12 @@
   "license": "ISC",
   "dependencies": {
     "@clerk/express": "^2.1.40",
+    "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "google-auth-library": "^11.1.0",
     "jsonwebtoken": "^9.0.3",
     "mognoose": "^1.0.3",
     "mongoose": "^9.3.3",

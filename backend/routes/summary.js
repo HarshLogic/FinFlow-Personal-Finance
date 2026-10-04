@@ -2,8 +2,9 @@ const router = require("express").Router();
 const { Stock, MutualFund, FixedDeposit, Liquid, Expense } = require("../models");
  
 router.get("/", async (req, res) => {
+  console.log("INSIDE /api/summary ROUTE!");
   try {
-    const USER = req.auth.userId; // 👈 Scoped inside the route
+    const USER = req.auth.userId; 
 
     const [stocks, mfs, fds, liquid, expenses] = await Promise.all([
       Stock.find({ userId: USER }),
@@ -33,10 +34,42 @@ router.get("/", async (req, res) => {
  
     // ── Expense analytics ─────────────────────────────────────────────────────
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthlyExp = expenses.filter(e => new Date(e.date) >= startOfMonth);
-    const needSpend  = monthlyExp.filter(e => e.type === "need").reduce((s, e) => s + e.amount, 0);
-    const wantSpend  = monthlyExp.filter(e => e.type === "want").reduce((s, e) => s + e.amount, 0);
+const startOfMonth = new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  1
+);
+
+const startOfNextMonth = new Date(
+  now.getFullYear(),
+  now.getMonth() + 1,
+  1
+);
+
+const monthlyExp = expenses.filter((e) => {
+  const expenseDate = new Date(e.date);
+
+  return (
+    expenseDate >= startOfMonth &&
+    expenseDate < startOfNextMonth
+  );
+});
+
+const needSpend = monthlyExp
+  .filter((e) => e.type === "need")
+  .reduce(
+    (sum, e) => sum + Number(e.amount || 0),
+    0
+  );
+
+const wantSpend = monthlyExp
+  .filter((e) => e.type === "want")
+  .reduce(
+    (sum, e) => sum + Number(e.amount || 0),
+    0
+  );
+
+    const totalMonthlySpend = needSpend + wantSpend;
  
     // ── Total wealth ──────────────────────────────────────────────────────────
     const totalWealth   = liquidBal + stockValue + mfValue + fdMaturity;
@@ -66,7 +99,6 @@ router.get("/", async (req, res) => {
 // GET /api/summary/projection?monthly=&rate=&years=
 router.get("/projection", (req, res) => {
   try {
-    // Note: The projection route does not touch the database, so it does not need a USER variable
     const monthly = Number(req.query.monthly) || 10000;
     const rate    = Number(req.query.rate)    || 12;      // annual %
     const years   = Number(req.query.years)   || 20;

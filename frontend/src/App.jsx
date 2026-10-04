@@ -4,17 +4,22 @@ import Dashboard from "./pages/Dashboard";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import Portfolio from "./pages/Portfolio";
 import WealthProjection from "./pages/WealthProjection";
+import InvestmentPlanner from "./pages/InvestmentPlanner";
 import LandingPage from "./pages/LandingPage";
 import { themes, common } from "./shared";
 
 // We use SignedIn and SignedOut directly from Clerk
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { useAuth } from "./context/AuthContext";
+
+import { LayoutDashboard, Receipt, Briefcase, TrendingUp, LineChart, Bot } from "lucide-react";
+
 
 const NAV = [
-  { id: "dashboard", icon: "⬡", label: "Dashboard" },
-  { id: "expenses", icon: "◈", label: "Expense Track" },
-  { id: "portfolio", icon: "◉", label: "Portfolio" },
-  { id: "projection", icon: "◎", label: "Projections" },
+  { id: "dashboard", icon: <LayoutDashboard size={20} strokeWidth={1.5} />, label: "Dashboard" },
+  { id: "expenses", icon: <Receipt size={20} strokeWidth={1.5} />, label: "Expense Track" },
+  { id: "portfolio", icon: <Briefcase size={20} strokeWidth={1.5} />, label: "Portfolio" },
+  { id: "projection", icon: <TrendingUp size={20} strokeWidth={1.5} />, label: "Projections" },
+  { id: "planner", icon: <LineChart size={20} strokeWidth={1.5} />, label: "Invest Planner" },
 ];
 
 const TITLES = {
@@ -22,6 +27,7 @@ const TITLES = {
   expenses: "Expense Tracker",
   portfolio: "Portfolio Manager",
   projection: "Wealth Projections",
+  planner: "Investment Planner",
 };
 
 export default function App() {
@@ -53,17 +59,22 @@ export default function App() {
     expenses: ExpenseTracker,
     portfolio: Portfolio,
     projection: WealthProjection,
+    planner: InvestmentPlanner,
   }[page];
+
+  const { user, loading, logout } = useAuth();
+
+  if (loading) return <div style={{ color: "white", padding: 20 }}>Loading...</div>;
 
   return (
     <>
       {/* ── 1. LOGGED OUT VIEW: SHOWS YOUR LANDING PAGE ── */}
-      <SignedOut>
+      {!user && (
         <LandingPage />
-      </SignedOut>
+      )}
 
       {/* ── 2. LOGGED IN VIEW: SHOWS YOUR EXISTING DASHBOARD ── */}
-      <SignedIn>
+      {user && (
         <div
           style={{
             display: "flex",
@@ -267,8 +278,8 @@ export default function App() {
                 >
                   🟢 Live
                 </div>
-                {/* ── CLERK USER BUTTON ── */}
-                <UserButton afterSignOutUrl="/" />
+                {/* ── CUSTOM USER BUTTON ── */}
+                <button onClick={logout} style={{ padding: "6px 12px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.red + "22", color: C.red, cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>Logout</button>
               </div>
             </header>
 
@@ -327,8 +338,32 @@ export default function App() {
               ))}
             </nav>
           )}
+
+          {/* ── AI AGENT PLACEHOLDER CIRCLE ── */}
+          <div
+            style={{
+              position: "fixed",
+              bottom: isMobile ? 80 : 30,
+              right: 30,
+              width: 50,
+              height: 50,
+              borderRadius: "50%",
+              background: C.gold,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 9999,
+              fontSize: 24,
+            }}
+            title="AI Agent (Placeholder)"
+          >
+            🤖
+            <Bot size={28} strokeWidth={1.5} color="#000" />
+          </div>
         </div>
-      </SignedIn>
+      )}
     </>
   );
 }

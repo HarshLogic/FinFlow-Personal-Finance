@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
 // POST /api/expenses
 router.post("/", async (req, res) => {
   try {
-    const USER = req.auth.userId; // 👈 
+    const USER = req.auth.userId;  
     const expense = await Expense.create({ ...req.body, userId: USER });
     res.status(201).json(expense);
   } catch (e) { res.status(400).json({ error: e.message }); }
@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
 // PUT  /api/expenses/:id
 router.put("/:id", async (req, res) => {
   try {
-    const USER = req.auth.userId; // 👈 
+    const USER = req.auth.userId; 
     const expense = await Expense.findOneAndUpdate(
       { _id: req.params.id, userId: USER },
       req.body,
@@ -49,7 +49,7 @@ router.put("/:id", async (req, res) => {
 // DELETE /api/expenses/:id
 router.delete("/:id", async (req, res) => {
   try {
-    const USER = req.auth.userId; // 👈 
+    const USER = req.auth.userId; 
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: USER });
     if (!expense) return res.status(404).json({ error: "Not found" });
     res.json({ message: "Deleted" });
@@ -59,7 +59,7 @@ router.delete("/:id", async (req, res) => {
 // GET /api/expenses/analytics
 router.get("/analytics", async (req, res) => {
   try {
-    const USER = req.auth.userId; // 👈 
+    const USER = req.auth.userId; 
     const agg = await Expense.aggregate([
       { $match: { userId: USER } },
       { $group: {
@@ -77,4 +77,31 @@ router.get("/analytics", async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
  
+// GET /api/expenses/export
+router.get("/export", async (req, res) => {
+  try {
+    const USER = req.auth.userId;
+    const expenses = await Expense.find({ userId: USER }).sort({ date: -1 });
+    
+    // Generate CSV string
+    const headers = "Date,Title,Amount,Type,Category\n";
+    const rows = expenses.map(e => {
+      const date = new Date(e.date).toISOString().split('T')[0];
+      const title = `"${(e.title || '').replace(/"/g, '""')}"`;
+      const amount = e.amount;
+      const type = e.type;
+      const category = e.category || 'Other';
+      return `${date},${title},${amount},${type},${category}`;
+    }).join("\n");
+    
+    const csvContent = headers + rows;
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=expenses.csv');
+    res.status(200).send(csvContent);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;

@@ -91,6 +91,25 @@ fixedDepositSchema.virtual("interestEarned").get(function () {
 });
 fixedDepositSchema.set("toJSON", { virtuals: true });
  
+// ── User ───────────────────────────────────────────────────────────────────────
+const userSchema = new Schema({
+  userId:   { type: String, required: true, unique: true },
+  email:    { type: String, required: true, unique: true },
+  password: { type: String }, // optional because of Google Auth
+  googleId: { type: String }
+}, { timestamps: true });
+
+// ── Income ────────────────────────────────────────────────────────────────────
+const incomeSchema = new Schema({
+  userId:   { type: String, required: true, index: true },
+  date:     { type: Date,   required: true },
+  source:   { type: String, required: true, trim: true },
+  amount:   { type: Number, required: true, min: 0 },
+  notes:    { type: String, default: "" },
+}, { timestamps: true });
+
+incomeSchema.index({ userId: 1, date: -1 });
+
 // ── Liquid Cash ───────────────────────────────────────────────────────────────
 const liquidSchema = new Schema({
   userId:    { type: String, required: true, unique: true },
@@ -100,6 +119,8 @@ const liquidSchema = new Schema({
  
 // ── Exports ───────────────────────────────────────────────────────────────────
 module.exports = {
+  User:          mongoose.model("User",          userSchema),
+  Income:        mongoose.model("Income",        incomeSchema),
   Expense:       mongoose.model("Expense",       expenseSchema),
   Stock:         mongoose.model("Stock",         stockSchema),
   MutualFund:    mongoose.model("MutualFund",    mutualFundSchema),

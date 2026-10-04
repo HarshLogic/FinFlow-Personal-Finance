@@ -2,7 +2,7 @@ const express  = require("express");
 const mongoose = require("mongoose");
 const cors     = require("cors");
 const dotenv   = require("dotenv");
-const { clerkMiddleware, requireAuth } = require("@clerk/express"); 
+const { requireAuth } = require("./middleware/auth"); 
 
 dotenv.config();
  
@@ -29,8 +29,6 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use(clerkMiddleware());
- 
 // ── Routes ────────────────────────────────────────────────────────────────────
 const { mfRouter, fdRouter, liquidRouter } = require("./routes/portfolio");
 
@@ -39,7 +37,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/expenses",    requireAuth(), require("./routes/expenses"));
+app.use("/api/income",      requireAuth(), require("./routes/income"));
 app.use("/api/stocks",      requireAuth(), require("./routes/stocks"));
 app.use("/api/mutualfunds", requireAuth(), mfRouter);
 app.use("/api/fds",         requireAuth(), fdRouter);
@@ -59,6 +59,7 @@ mongoose
       require("./cron/schedular");
     });
   })
-  .catch(err => { console.error("❌  MongoDB connection failed:", err); process.exit(1); });
+  .catch(err => { console.error("MongoDB connection failed:", err); process.exit(1); });
  
+module.exports = app;
 module.exports = app;

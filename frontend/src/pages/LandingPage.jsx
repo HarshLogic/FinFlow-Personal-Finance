@@ -1,7 +1,7 @@
 // frontend/src/pages/LandingPage.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SignInButton } from "@clerk/clerk-react";
+import AuthModal from "../components/AuthModal";
 import { 
   ArrowRight, 
   TrendingUp, 
@@ -33,7 +33,7 @@ const staggerContainer = {
   }
 };
 
-const Navbar = () => {
+const Navbar = ({ onOpenAuth }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -69,18 +69,14 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <SignInButton mode="modal">
-            <button className="text-sm font-medium text-white hover:text-emerald-400 transition-colors cursor-pointer">Log in</button>
-          </SignInButton>
+          <button onClick={onOpenAuth} className="text-sm font-medium text-white hover:text-emerald-400 transition-colors cursor-pointer">Log in</button>
           
-          <SignInButton mode="modal">
-            <button className="group relative px-5 py-2.5 bg-white text-black font-semibold rounded-full text-sm overflow-hidden transition-transform active:scale-95 cursor-pointer">
+          <button onClick={onOpenAuth} className="group relative px-5 py-2.5 bg-white text-black font-semibold rounded-full text-sm overflow-hidden transition-transform active:scale-95 cursor-pointer">
               <span className="relative z-10 flex items-center gap-2">
                 Get Started <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-200 to-cyan-200 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
-          </SignInButton>
         </div>
 
         <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -103,12 +99,8 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="h-px bg-white/10 w-full my-2"></div>
-              <SignInButton mode="modal">
-                <button className="w-full py-3 text-white font-medium bg-white/5 rounded-lg border border-white/10 cursor-pointer">Log in</button>
-              </SignInButton>
-              <SignInButton mode="modal">
-                <button className="w-full py-3 bg-emerald-500 text-black font-semibold rounded-lg cursor-pointer">Get Started</button>
-              </SignInButton>
+              <button onClick={onOpenAuth} className="w-full py-3 text-white font-medium bg-white/5 rounded-lg border border-white/10 cursor-pointer">Log in</button>
+              <button onClick={onOpenAuth} className="w-full py-3 bg-emerald-500 text-black font-semibold rounded-lg cursor-pointer">Get Started</button>
             </div>
           </motion.div>
         )}
@@ -117,7 +109,7 @@ const Navbar = () => {
   );
 };
 
-const Hero = () => {
+const Hero = ({ onOpenAuth }) => {
   return (
     <section className="relative min-h-screen bg-[#050505] flex items-center pt-32 pb-20 overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -153,14 +145,12 @@ const Hero = () => {
           </motion.p>
           
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
-            <SignInButton mode="modal">
-              <button className="group relative px-8 py-4 bg-white text-black font-semibold rounded-xl text-base overflow-hidden transition-transform active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer">
+            <button onClick={onOpenAuth} className="group relative px-8 py-4 bg-white text-black font-semibold rounded-xl text-base overflow-hidden transition-transform active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer">
                 Start Building Wealth <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-            </SignInButton>
-            <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 backdrop-blur-md transition-all flex items-center justify-center cursor-pointer">
+            <a href="https://fin-flow-personal-finance.vercel.app" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 backdrop-blur-md transition-all flex items-center justify-center cursor-pointer">
               View Live Demo
-            </button>
+            </a>
           </motion.div>
         </motion.div>
 
@@ -287,14 +277,17 @@ const Footer = () => {
 };
 
 export default function LandingPage() {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
-      <Navbar />
+      <Navbar onOpenAuth={() => setIsAuthOpen(true)} />
       <main>
-        <Hero />
+        <Hero onOpenAuth={() => setIsAuthOpen(true)} />
         <Features />
       </main>
       <Footer />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </div>
   );
 }

@@ -12,6 +12,20 @@ export const api = axios.create({
   baseURL: BASE_URL,
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+export const registerUser   = (data) => api.post("/auth/register", data);
+export const loginUser      = (data) => api.post("/auth/login", data);
+export const googleLogin    = (credential) => api.post("/auth/google", { credential });
+export const getMe          = () => api.get("/auth/me");
+
 // ── Expenses ──────────────────────────────────────────────────────────────────
 export const getExpenses    = (params) => api.get("/expenses", { params });
 export const createExpense  = (data)   => api.post("/expenses", data);
@@ -49,3 +63,8 @@ export const updateLiquid   = (balance) => api.put("/liquid", { balance });
 export const getSummary     = ()       => api.get("/summary");
 export const getProjection  = (params) => api.get("/summary/projection", { params });
 // ── Export Expenses CSV ─────────────────────────────────────
+// ── Income ─────────────────────────────────────────────────────────────────
+export const getIncome      = (params) => api.get("/income", { params });
+export const createIncome   = (data)   => api.post("/income", data);
+export const updateIncome   = (id, data) => api.put(`/income/${id}`, data);
+export const deleteIncome   = (id)     => api.delete(`/income/${id}`);
