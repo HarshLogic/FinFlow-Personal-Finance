@@ -1,11 +1,11 @@
+const dotenv   = require("dotenv");
+dotenv.config(); // Load before anything else!
+
 const express  = require("express");
 const mongoose = require("mongoose");
 const cors     = require("cors");
-const dotenv   = require("dotenv");
 const { requireAuth } = require("./middleware/auth"); 
 
-dotenv.config();
- 
 const app = express();
  
 const allowedOrigins = [
@@ -17,7 +17,6 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-
     if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
@@ -33,7 +32,6 @@ app.use(express.json());
 const { mfRouter, fdRouter, liquidRouter } = require("./routes/portfolio");
 
 app.use((req, res, next) => {
-  console.log(req.method, req.url);
   next();
 });
 
@@ -55,11 +53,10 @@ mongoose
   .then(() => {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
-      console.log(`✅  FinFlow API running on port ${PORT}`);
+      console.log(`✅  Finance Flow API running on port ${PORT}`);
       require("./cron/schedular");
     });
   })
   .catch(err => { console.error("MongoDB connection failed:", err); process.exit(1); });
  
-module.exports = app;
 module.exports = app;

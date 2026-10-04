@@ -25,6 +25,7 @@ export const registerUser   = (data) => api.post("/auth/register", data);
 export const loginUser      = (data) => api.post("/auth/login", data);
 export const googleLogin    = (credential) => api.post("/auth/google", { credential });
 export const getMe          = () => api.get("/auth/me");
+export const changePassword = (data) => api.post("/auth/change-password", data);
 
 // ── Expenses ──────────────────────────────────────────────────────────────────
 export const getExpenses    = (params) => api.get("/expenses", { params });

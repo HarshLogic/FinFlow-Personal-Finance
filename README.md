@@ -39,13 +39,13 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 📊 Wealth Projection | ✅ Complete | SIP formula, debounced sliders |
 | 🔐 Authentication | ✅ Complete | JWT login/signup — replacing `demo_user` hardcode |
 | 👤 User Profiles | ✅ Complete | Per-user data isolation |
-| 🤖 Build AI Agent | 🔜 Planned | Build a Ai agent for FinFlow |
+| 🤖 Build AI Agent | ✅ Complete | Interactive Finance Flow Chatbot |
 | 📬 Monthly Budget Alerts | 🔜 Planned | Email alert when spend exceeds budget |
 | 🔄 Live Stock Price Sync | ✅ Complete | Cron job to auto-fetch CMP from NSE API |
 | 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly forms |
 | 📤 Export to CSV / PDF | ✅ Complete | Download expense reports and portfolio snapshot |
 | 🌙 Light Mode Toggle | ✅ Complete | Currently dark-only |
-| 📱 App | 🔜 Planned | App for FinFlow |
+| 📱 App | 🔜 Planned | App for Finance Flow |
 
 ---
 
@@ -102,6 +102,23 @@ Track every rupee. Manage every asset. Project your future wealth.
 - Area chart showing corpus growth vs amount invested over time
 - Milestone cards at 5, 10, 15, 20 year marks
 - Wealth multiplier shown (e.g. `6.7×`)
+
+### 🧠 AI Assistant Chatbot
+- Interactive floating chatbot trained on Finance Flow data
+- Real-time responses to natural language questions (e.g., "What is my total wealth?")
+- Provides on-the-fly education about financial concepts (Needs vs Wants, Asset Allocation)
+
+### 🔐 Authentication & User Profiles
+- Secure JWT-based Login and Registration
+- Google Sign-In OAuth Integration
+- Dedicated User Profile settings page
+- Change password functionality with bcrypt hashing
+
+### 🎯 Investment Planner
+- Advanced asset allocation planning tool
+- Recommends portfolio weights across Stocks, MFs, FDs, and Gold
+- Validates total allocations sum to exactly 100%
+- Calculates exact monthly currency amounts for each asset class based on income
 
 ---
 
@@ -321,7 +338,7 @@ NODE_ENV=development
 
 ```bash
 # Terminal 1
-cd backend && npm run dev      # ✅ FinFlow API running on port 5000
+cd backend && npm run dev      # ✅ Finance Flow API running on port 5000
 
 # Terminal 2
 cd frontend && npm run dev     # → http://localhost:5173
@@ -377,7 +394,7 @@ cd frontend && npm run dev     # → http://localhost:5173
 
 ## 📄 License
 
-MIT © 2026 FinFlow — Personal Finance Ecosystem
+MIT © 2026 Finance Flow — Personal Finance Ecosystem
 
 ---
 

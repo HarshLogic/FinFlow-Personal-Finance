@@ -91,9 +91,50 @@ router.get("/me", async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findOne({ userId: decoded.userId });
     if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ user: { email: user.email, userId: user.userId } });
+    
+    res.json({ 
+      user: { 
+        email: user.email, 
+        userId: user.userId,
+        createdAt: user.createdAt,
+        authMethod: user.googleId ? "Google OAuth" : "Email & Password"
+      } 
+    });
   } catch (err) {
     res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+router.post("/change-password", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "No token provided" });
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Current and new password are required" });
+    }
+
+    const user = await User.findOne({ userId: decoded.userId });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (!user.password) {
+      return res.status(400).json({ error: "Account uses Google Sign-In. Password cannot be changed." });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Incorrect current password" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

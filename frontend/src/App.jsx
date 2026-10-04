@@ -5,13 +5,15 @@ import ExpenseTracker from "./pages/ExpenseTracker";
 import Portfolio from "./pages/Portfolio";
 import WealthProjection from "./pages/WealthProjection";
 import InvestmentPlanner from "./pages/InvestmentPlanner";
+import UserProfile from "./pages/UserProfile";
 import LandingPage from "./pages/LandingPage";
+import Chatbot from "./components/Chatbot";
 import { themes, common } from "./shared";
 
 // We use SignedIn and SignedOut directly from Clerk
 import { useAuth } from "./context/AuthContext";
 
-import { LayoutDashboard, Receipt, Briefcase, TrendingUp, LineChart, Bot } from "lucide-react";
+import { LayoutDashboard, Receipt, Briefcase, TrendingUp, LineChart, User } from "lucide-react";
 
 
 const NAV = [
@@ -34,6 +36,7 @@ export default function App() {
   const [page, setPage] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -60,6 +63,7 @@ export default function App() {
     portfolio: Portfolio,
     projection: WealthProjection,
     planner: InvestmentPlanner,
+    profile: UserProfile,
   }[page];
 
   const { user, loading, logout } = useAuth();
@@ -108,32 +112,18 @@ export default function App() {
                 marginBottom: isMobile ? 0 : 16,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    background: C.gold,
-                    borderRadius: 10,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                    flexShrink: 0,
-                    fontWeight: 800,
-                    color: "#0D0F14",
-                  }}
-                >
-                  ₹
-                </div>
-                {!collapsed && (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1 }}>
-                      FinFlow
-                    </div>
-                    <div style={{ fontSize: 10, color: C.muted }}>Personal Finance</div>
-                  </div>
-                )}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <img 
+                  src="/logo.png" 
+                  alt="Finance Flow" 
+                  style={{ 
+                    height: collapsed ? 36 : 48, 
+                    width: collapsed ? 36 : "auto", 
+                    objectFit: "cover",
+                    objectPosition: "left",
+                    transition: "all 0.25s"
+                  }} 
+                />
               </div>
             </div>
             <nav
@@ -266,18 +256,26 @@ export default function App() {
                 >
                   {theme === "dark" ? "☀ Light" : "🌙 Dark"}
                 </button>
-                <div
+                <button
+                  onClick={() => setPage("profile")}
                   style={{
-                    fontSize: 12,
-                    color: C.muted,
-                    background: C.card,
-                    border: `1px solid ${C.border}`,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: page === "profile" ? "#0D0F14" : C.text,
+                    background: page === "profile" ? C.gold : C.surface,
+                    border: `1px solid ${page === "profile" ? C.gold : C.border}`,
                     padding: "6px 14px",
                     borderRadius: 20,
+                    cursor: "pointer",
+                    transition: "all 0.2s"
                   }}
                 >
-                  🟢 Live
-                </div>
+                  <User size={16} />
+                  User Profile
+                </button>
                 {/* ── CUSTOM USER BUTTON ── */}
                 <button onClick={logout} style={{ padding: "6px 12px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.red + "22", color: C.red, cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>Logout</button>
               </div>
@@ -340,28 +338,31 @@ export default function App() {
           )}
 
           {/* ── AI AGENT PLACEHOLDER CIRCLE ── */}
-          <div
-            style={{
-              position: "fixed",
-              bottom: isMobile ? 80 : 30,
-              right: 30,
-              width: 50,
-              height: 50,
-              borderRadius: "50%",
-              background: C.gold,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              zIndex: 9999,
-              fontSize: 24,
-            }}
-            title="AI Agent (Placeholder)"
-          >
-            🤖
-            <Bot size={28} strokeWidth={1.5} color="#000" />
-          </div>
+          {!isChatOpen && (
+            <div
+              onClick={() => setIsChatOpen(true)}
+              style={{
+                position: "fixed",
+                bottom: isMobile ? 80 : 30,
+                right: 30,
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 9999,
+              }}
+              title="AI Agent"
+            >
+              <img src="/chatbot.jpg" alt="AI Agent" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+          )}
+          
+          <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
         </div>
       )}
     </>

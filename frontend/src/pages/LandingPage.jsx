@@ -53,11 +53,8 @@ const Navbar = ({ onOpenAuth }) => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-black" strokeWidth={3} />
-          </div>
-          <span className="text-xl font-bold text-white tracking-tight">FinFlow<span className="text-emerald-400">.</span></span>
+        <div className="flex items-center cursor-pointer">
+          <img src="/logo.png" alt="Finance Flow" style={{ height: 40, width: "auto" }} />
         </div>
 
         <div className="hidden md:flex items-center gap-8">
@@ -132,7 +129,7 @@ const Hero = ({ onOpenAuth }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            FinFlow
+            Finance Flow
           </motion.div>
           
           <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-6">
@@ -141,7 +138,7 @@ const Hero = ({ onOpenAuth }) => {
           </motion.h1>
           
           <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-400 mb-10 leading-relaxed font-light">
-            Take absolute control of your financial destiny. FinFlow combines real-time tracking, predictive analytics, and bank-grade security into one seamless experience.
+            Take absolute control of your financial destiny. Finance Flow combines real-time tracking, predictive analytics, and bank-grade security into one seamless experience.
           </motion.p>
           
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
@@ -266,7 +263,7 @@ const Footer = () => {
   return (
     <footer className="bg-[#050505] border-t border-white/10 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
-        <p>© 2026 FinFlow Inc. All rights reserved.</p>
+        <p>© 2026 Finance Flow Inc. All rights reserved.</p>
         <div className="flex gap-6">
           <a href="#!" className="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#!" className="hover:text-white transition-colors">Terms of Service</a>
