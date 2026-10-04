@@ -45,7 +45,7 @@ Track every rupee. Manage every asset. Project your future wealth.
 | 📱 Mobile Responsive UI | ✅ Complete | Sidebar collapses, touch-friendly forms |
 | 📤 Export to CSV / PDF | ✅ Complete | Download expense reports and portfolio snapshot |
 | 🌙 Light Mode Toggle | ✅ Complete | Currently dark-only |
-| 📱 App | 🔜 Planned | App for Finance Flow |
+| 📱 App | ✅ Complete | App for Finance Flow |
 
 ---
 
