@@ -4,8 +4,9 @@ console.log("API URL:", process.env.REACT_APP_API_URL);
 
 // Base URL
 const BASE_URL =
-  process.env.REACT_APP_API_URL ||
-  "https://finflow-personal-finance.onrender.com/api";
+  process.env.REACT_APP_API_URL && process.env.REACT_APP_API_URL !== "http://localhost:3000"
+    ? process.env.REACT_APP_API_URL
+    : "http://localhost:5000/api";
 
 // Axios instance
 export const api = axios.create({

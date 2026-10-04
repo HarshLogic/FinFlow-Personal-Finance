@@ -10,3 +10,4 @@ frontend/.env
 backend/.env
 .vercel
 .env*
+.env.local
