@@ -11,7 +11,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  "https://fin-flow-personal-finance.vercel.app" 
+  "https://finflowpr.vercel.app/" 
 ];
 
 app.use(cors({
