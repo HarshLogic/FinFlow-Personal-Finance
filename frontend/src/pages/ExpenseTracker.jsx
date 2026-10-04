@@ -16,7 +16,7 @@ import {
   exportExpenses,
   getIncome,
   createIncome,
-  deleteIncome,
+  // deleteIncome,
 } from "../api";
 
 import {
@@ -178,21 +178,21 @@ const add = async () => {
   // --------------------------------------------------
   // DELETE INCOME
   // --------------------------------------------------
-  const deleteIncomeItem = async (id) => {
-    try {
-      await deleteIncome(id);
+  // const deleteIncomeItem = async (id) => {
+  //   try {
+  //     await deleteIncome(id);
 
-      setIncome((prevIncome) =>
-        prevIncome.filter((item) => item._id !== id)
-      );
-    } catch (e) {
-      const errorMsg =
-        e.response?.data?.error ||
-        "Failed to delete income";
+  //     setIncome((prevIncome) =>
+  //       prevIncome.filter((item) => item._id !== id)
+  //     );
+  //   } catch (e) {
+  //     const errorMsg =
+  //       e.response?.data?.error ||
+  //       "Failed to delete income";
 
-      setError(errorMsg);
-    }
-  };
+  //     setError(errorMsg);
+  //   }
+  // };
 
   // --------------------------------------------------
   // EXPORT
