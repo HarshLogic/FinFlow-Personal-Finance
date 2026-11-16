@@ -10,7 +10,8 @@ const requireAuth = () => {
 
     const token = authHeader.split(" ")[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const JWT_SECRET = process.env.JWT_SECRET || "finflow_dev_jwt_secret_fallback_2026";
+      const decoded = jwt.verify(token, JWT_SECRET);
       req.auth = { userId: decoded.userId };
       next();
     } catch (err) {

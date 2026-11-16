@@ -18,34 +18,52 @@ router.get("/", async (req, res) => {
  
 router.post("/", async (req, res) => {
   try {
-    const USER = req.auth.userId; // 👈 Scoped inside the route
-    var stockData = {...req.body};
+    const USER = req.auth.userId;
+    const stockData = { ...req.body };
     const keyword = stockData.ticker;
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    const tickerResponse = await fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${keyword}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
-    const tickerData = await tickerResponse.json();
-    if(!tickerData["bestMatches"]?.length){throw new Error("Invalid stock")}
+    if (process.env.ALPHA_VANTAGE_API_KEY && keyword) {
+      try {
+        const tickerResponse = await fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${keyword}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
+        const tickerData = await tickerResponse.json();
 
-    const tickerResult = tickerData["bestMatches"].filter(m=>m["4. region"]?.includes("India") && m["2. name"]?.toLowerCase().includes(keyword.toLowerCase()))
-    if(!tickerResult.length){throw new Error("Stock not listed in India")}
+        if (tickerData["bestMatches"]?.length) {
+          const tickerResult = tickerData["bestMatches"].filter(m => 
+            m["4. region"]?.includes("India") && m["2. name"]?.toLowerCase().includes(keyword.toLowerCase())
+          );
+          if (tickerResult.length) {
+            stockData.ticker = tickerResult[0]["1. symbol"].toUpperCase();
+            stockData.companyName = tickerResult[0]["2. name"];
+          }
+        }
 
-    stockData.ticker = tickerResult[0]["1. symbol"].toUpperCase();
-    stockData.companyName = tickerResult[0]["2. name"];
+        await sleep(1000);
 
-    await sleep(1000);
-
-    const cmpResponse = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockData.ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
-    const cmpData = await cmpResponse.json();
-    stockData.cmp = toPositiveNumber(cmpData["Global Quote"]?.["05. price"]);
-    if (stockData.cmp === null) {
-      throw new Error("Unable to fetch a valid stock price");
+        const cmpResponse = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockData.ticker}&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`);
+        const cmpData = await cmpResponse.json();
+        const fetchedCmp = toPositiveNumber(cmpData["Global Quote"]?.["05. price"]);
+        if (fetchedCmp !== null) {
+          stockData.cmp = fetchedCmp;
+        }
+      } catch (apiErr) {
+        console.warn("AlphaVantage stock lookup notice:", apiErr.message);
+      }
     }
-    
+
+    if (!stockData.cmp) {
+      stockData.cmp = toPositiveNumber(stockData.avgPrice) || Number(stockData.avgPrice) || 0;
+    }
+
+    if (!stockData.ticker || !stockData.qty || !stockData.avgPrice) {
+      return res.status(400).json({ error: "Ticker, quantity, and avgPrice are required" });
+    }
+
     const stock = await Stock.create({ ...stockData, userId: USER });
     res.status(201).json(stock);
-
-  } catch (e) { res.status(400).json({ error: e.message }); }
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 });
  
 router.put("/:id", async (req, res) => {

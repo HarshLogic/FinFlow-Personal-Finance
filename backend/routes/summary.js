@@ -1,21 +1,21 @@
 const router = require("express").Router();
-const { Stock, MutualFund, FixedDeposit, Liquid, Expense } = require("../models");
+const { Stock, MutualFund, FixedDeposit, Liquid, Expense, Account, decimalToNumber } = require("../models");
  
 router.get("/", async (req, res) => {
-  console.log("INSIDE /api/summary ROUTE!");
   try {
     const USER = req.auth.userId; 
 
-    const [stocks, mfs, fds, liquid, expenses] = await Promise.all([
+    const [stocks, mfs, fds, liquid, expenses, accounts] = await Promise.all([
       Stock.find({ userId: USER }),
       MutualFund.find({ userId: USER }),
       FixedDeposit.find({ userId: USER }),
       Liquid.findOne({ userId: USER }),
       Expense.find({ userId: USER }),
+      Account.find({ userId: USER, isActive: true, isLiquid: true }),
     ]);
  
     // ── Stock metrics ─────────────────────────────────────────────────────────
-    const stockValue    = stocks.reduce((s, st) => s + st.qty * st.cmp, 0);
+    const stockValue    = stocks.reduce((s, st) => s + st.qty * (st.cmp || 0), 0);
     const stockCost     = stocks.reduce((s, st) => s + st.qty * st.avgPrice, 0);
     const stockPL       = stockValue - stockCost;
  
@@ -30,7 +30,12 @@ router.get("/", async (req, res) => {
     const fdInterest    = fdMaturity - fdPrincipal;
  
     // ── Cash ──────────────────────────────────────────────────────────────────
-    const liquidBal     = liquid?.balance ?? 0;
+    let liquidBal = 0;
+    if (accounts && accounts.length > 0) {
+      liquidBal = accounts.reduce((sum, acc) => sum + decimalToNumber(acc.currentBalance), 0);
+    } else {
+      liquidBal = liquid?.balance ?? 0;
+    }
  
     // ── Expense analytics ─────────────────────────────────────────────────────
     const now = new Date();
@@ -82,14 +87,14 @@ const wantSpend = monthlyExp
         totalInvested,
         totalPL,
         allocation: {
-          liquid:       { value: liquidBal,   pct: ((liquidBal  / totalWealth) * 100).toFixed(1) },
-          stocks:       { value: stockValue,  pct: ((stockValue / totalWealth) * 100).toFixed(1) },
-          mutualFunds:  { value: mfValue,     pct: ((mfValue    / totalWealth) * 100).toFixed(1) },
-          fixedDeposits:{ value: fdMaturity,  pct: ((fdMaturity / totalWealth) * 100).toFixed(1) },
+          liquid:       { value: liquidBal,   pct: totalWealth ? ((liquidBal  / totalWealth) * 100).toFixed(1) : "0.0" },
+          stocks:       { value: stockValue,  pct: totalWealth ? ((stockValue / totalWealth) * 100).toFixed(1) : "0.0" },
+          mutualFunds:  { value: mfValue,     pct: totalWealth ? ((mfValue    / totalWealth) * 100).toFixed(1) : "0.0" },
+          fixedDeposits:{ value: fdMaturity,  pct: totalWealth ? ((fdMaturity / totalWealth) * 100).toFixed(1) : "0.0" },
         },
       },
-      stocks:  { value: stockValue,  cost: stockCost,    pl: stockPL,  plPct: ((stockPL/stockCost)*100).toFixed(2) },
-      mf:      { value: mfValue,     cost: mfCost,       pl: mfPL,     plPct: ((mfPL/mfCost)*100).toFixed(2) },
+      stocks:  { value: stockValue,  cost: stockCost,    pl: stockPL,  plPct: stockCost ? ((stockPL/stockCost)*100).toFixed(2) : "0.00" },
+      mf:      { value: mfValue,     cost: mfCost,       pl: mfPL,     plPct: mfCost ? ((mfPL/mfCost)*100).toFixed(2) : "0.00" },
       fds:     { maturity: fdMaturity, principal: fdPrincipal, interest: fdInterest },
       expenses:{ needSpend, wantSpend, total: needSpend + wantSpend },
     });

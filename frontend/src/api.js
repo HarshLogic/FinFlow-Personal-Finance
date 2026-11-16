@@ -70,3 +70,33 @@ export const getIncome      = (params) => api.get("/income", { params });
 export const createIncome   = (data)   => api.post("/income", data);
 export const updateIncome   = (id, data) => api.put(`/income/${id}`, data);
 export const deleteIncome   = (id)     => api.delete(`/income/${id}`);
+
+// ── Budget & Safe-to-Spend ──────────────────────────────────────────────────
+export const getSafeToSpend   = ()       => api.get("/budget/safe-to-spend");
+export const getBudgetCycle   = ()       => api.get("/budget/cycle");
+export const updateBudgetCycle = (data)  => api.put("/budget/cycle", data);
+
+// ── Accounts ─────────────────────────────────────────────────────────────────
+export const getAccounts      = ()       => api.get("/accounts");
+export const createAccount    = (data)   => api.post("/accounts", data);
+export const updateAccount    = (id, data) => api.put(`/accounts/${id}`, data);
+export const deleteAccount    = (id)     => api.delete(`/accounts/${id}`);
+
+// ── Recurring Obligations ───────────────────────────────────────────────────
+export const getObligations   = ()       => api.get("/obligations");
+export const createObligation = (data)   => api.post("/obligations", data);
+export const updateObligation = (id, data) => api.put(`/obligations/${id}`, data);
+export const deleteObligation = (id)     => api.delete(`/obligations/${id}`);
+export const payObligation    = (id, data) => api.post(`/obligations/${id}/pay`, data);
+
+// ── Smart Transactions & SMS Parser ─────────────────────────────────────────
+export const parseSMS         = (text)   => api.post("/expenses/parse-sms", { text });
+export const quickAddExpense  = (data)   => api.post("/expenses/quick-add", data);
+
+// ── Peer Debt & Bill Splitting ──────────────────────────────────────────────
+export const getSplits        = (params) => api.get("/splits", { params });
+export const getSplitsSummary = ()       => api.get("/splits/summary");
+export const createSplit      = (data)   => api.post("/splits", data);
+export const updateSplit      = (id, data) => api.patch(`/splits/${id}`, data);
+export const settleSplit      = (id, data) => api.post(`/splits/${id}/settle`, data);
+export const deleteSplit      = (id)     => api.delete(`/splits/${id}`);

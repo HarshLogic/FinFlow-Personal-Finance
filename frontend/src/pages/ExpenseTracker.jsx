@@ -16,7 +16,7 @@ import {
   exportExpenses,
   getIncome,
   createIncome,
-  // deleteIncome,
+  deleteIncome,
 } from "../api";
 
 import {
@@ -178,21 +178,19 @@ const add = async () => {
   // --------------------------------------------------
   // DELETE INCOME
   // --------------------------------------------------
-  // const deleteIncomeItem = async (id) => {
-  //   try {
-  //     await deleteIncome(id);
-
-  //     setIncome((prevIncome) =>
-  //       prevIncome.filter((item) => item._id !== id)
-  //     );
-  //   } catch (e) {
-  //     const errorMsg =
-  //       e.response?.data?.error ||
-  //       "Failed to delete income";
-
-  //     setError(errorMsg);
-  //   }
-  // };
+  const deleteIncomeItem = async (id) => {
+    try {
+      await deleteIncome(id);
+      setIncome((prevIncome) =>
+        prevIncome.filter((item) => item._id !== id)
+      );
+    } catch (e) {
+      const errorMsg =
+        e.response?.data?.error ||
+        "Failed to delete income";
+      setError(errorMsg);
+    }
+  };
 
   // --------------------------------------------------
   // EXPORT
@@ -285,12 +283,22 @@ const add = async () => {
       }))
       .filter((c) => c.need + c.want > 0);
 
-    const filteredData =
-      filter === "all"
-        ? expenses
-        : expenses.filter(
-            (e) => e.type === filter
-          );
+    let filteredData = [];
+    if (filter === "income") {
+      filteredData = income.map(inc => ({
+        _id: inc._id,
+        label: inc.source,
+        amount: inc.amount,
+        date: inc.date,
+        category: "Savings",
+        type: "income",
+        isIncome: true
+      }));
+    } else if (filter === "all") {
+      filteredData = expenses;
+    } else {
+      filteredData = expenses.filter((e) => e.type === filter);
+    }
 
     return {
       needSpend: needs,
@@ -298,7 +306,7 @@ const add = async () => {
       catData: categories,
       filtered: filteredData,
     };
-  }, [expenses, filter]);
+  }, [expenses, income, filter]);
 
   // --------------------------------------------------
   // LOADING
@@ -740,6 +748,7 @@ const add = async () => {
                   "all",
                   "need",
                   "want",
+                  "income",
                 ].map((f) => (
                   <button
                     key={f}
@@ -901,7 +910,7 @@ const add = async () => {
 
                   <button
                     onClick={() =>
-                      del(e._id)
+                      e.isIncome ? deleteIncomeItem(e._id) : del(e._id)
                     }
                     style={{
                       background:

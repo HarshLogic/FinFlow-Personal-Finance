@@ -16,8 +16,7 @@ cron.schedule('35 15 * * *',async ()=>{
             const latestPrice = Number(cmpData["Global Quote"]?.["05. price"]);
 
             if (!Number.isNaN(latestPrice) && latestPrice > 0) {
-                stk.cmp = latestPrice;
-                await stk.save();
+                priceMap[ticker] = latestPrice;
             }
             await sleep(1000);
         }
