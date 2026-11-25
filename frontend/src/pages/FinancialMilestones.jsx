@@ -250,7 +250,7 @@ export default function FinancialMilestones({ C, onNavigate }) {
       </div>
 
       {/* 2 Key Milestones Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "20px", marginBottom: "24px" }}>
         {/* Milestone 1: Emergency Fund */}
         <div
           style={{

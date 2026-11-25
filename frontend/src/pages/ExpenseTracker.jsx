@@ -479,7 +479,8 @@ const add = async () => {
                 }))
               }
               style={{
-                width: f.width,
+                flex: "1 1 140px",
+                minWidth: 120,
                 padding: "9px 12px",
                 background: C.surface,
                 border: `1px solid ${C.border}`,

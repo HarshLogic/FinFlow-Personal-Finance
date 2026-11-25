@@ -392,7 +392,7 @@ export default function FinancialRulebook({ C, onNavigate }) {
                     }}
                   >
                     {/* Explanation & Why it matters */}
-                    <div style={{ marginTop: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div style={{ marginTop: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
                       <div>
                         <h4 style={{ fontSize: "0.82rem", textTransform: "uppercase", letterSpacing: "0.05em", color: C?.accent || "#2F6BFF", margin: "0 0 6px 0" }}>
                           Core Principle
@@ -412,7 +412,7 @@ export default function FinancialRulebook({ C, onNavigate }) {
                     </div>
 
                     {/* Formula & Practical Example */}
-                    <div style={{ marginTop: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div style={{ marginTop: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
                       <div
                         style={{
                           padding: "12px 16px",

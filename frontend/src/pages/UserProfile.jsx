@@ -59,7 +59,7 @@ export default function UserProfile({ C = themes.dark }) {
         User Profile
       </h2>
 
-      <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+      <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))" }}>
         {/* Profile Info Card */}
         <div style={{ ...common.card, display: "flex", flexDirection: "column", gap: 16 }}>
           <h3 style={{ fontSize: 18, fontWeight: 600, borderBottom: `1px solid ${C.border}`, paddingBottom: 12, marginBottom: 4 }}>Account Details</h3>

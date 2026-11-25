@@ -25,13 +25,13 @@ function AddRow({ fields, onAdd, saving, C }) {
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 16 }}>
       {fields.map(f => f.options ? (
         <select key={f.key} value={vals[f.key]} onChange={e => set(f.key, e.target.value)}
-          style={{ padding: "8px 10px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, color: C.text, fontSize: 12 }}>
+          style={{ flex: "1 1 120px", minWidth: 100, padding: "8px 10px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, color: C.text, fontSize: 12 }}>
           {f.options.map(o => <option key={o}>{o}</option>)}
         </select>
       ) : (
         <input key={f.key} type={f.type || "text"} placeholder={f.placeholder}
           value={vals[f.key]} onChange={e => set(f.key, e.target.value)}
-          style={{ width: f.width || 120, padding: "8px 10px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, color: C.text, fontSize: 12, outline: "none" }} />
+          style={{ flex: "1 1 120px", minWidth: 100, padding: "8px 10px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, color: C.text, fontSize: 12, outline: "none" }} />
       ))}
       <button onClick={() => { onAdd(vals); setVals(Object.fromEntries(fields.map(f => [f.key, f.default ?? ""]))); }}
         disabled={saving}
