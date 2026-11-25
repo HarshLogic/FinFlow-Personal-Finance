@@ -521,41 +521,6 @@ CLIENT_URL=http://localhost:3000
 ALPHA_VANTAGE_API_KEY=optional_demo_key
 ```
 
-#### Frontend Configuration
-Create `frontend/.env`:
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-```
-
----
-
-### Step 3: Install Dependencies
-
-```bash
-# Install backend packages
-cd backend
-npm install
-
-# Install frontend packages
-cd ../frontend
-npm install
-```
-
----
-
-### Step 4: Run the Development Servers
-
-Open two terminal windows:
-
-#### Terminal 1 — Backend API Server
-```bash
-cd backend
-npm run dev
-# ✅ Server running on port 5000
-# ✅ MongoDB Connected: finflow
-# ✅ Automated cron scheduler active
-```
-
 ## 📄 License & Acknowledgments
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
