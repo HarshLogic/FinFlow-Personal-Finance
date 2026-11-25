@@ -33,53 +33,49 @@ export const themes = {
   dark: {
     name: "dark",
     // Primary Brand Colors
-    charcoal: "#1E1E1C",
-    sand: "#D8CBB3",
-    electricBlue: "#2F6BFF",
-
-    // Surfaces & Backgrounds
-    bg: "#1E1E1C",            // Charcoal Page Background
-    card: "#282826",          // Card Background
-    surface: "#30302D",       // Elevated Surface
-    elevated: "#30302D",
+    bg: "#0D1117",            // Primary dark background
+    card: "#161B22",          // Secondary surface card
+    surface: "#1C2430",       // Elevated surface
+    elevated: "#1C2430",
 
     // Typography
-    text: "#D8CBB3",          // Sand Primary Text
-    textSecondary: "#A8A294", // Secondary Text
-    muted: "#A8A294",
+    text: "#F1F5F9",          // Primary text
+    textSecondary: "#94A3B8", // Secondary text
+    muted: "#94A3B8",
 
     // Accents & Borders
-    primary: "#2F6BFF",       // Electric Blue Brand Accent
-    accent: "#2F6BFF",
-    accentHover: "#1E55E0",
+    primary: "#10B981",       // Primary accent (Emerald)
+    accent: "#10B981",
+    accentHover: "#059669",
     accentForeground: "#FFFFFF",
-    accentMuted: "rgba(47, 107, 255, 0.14)",
-    gold: "#2F6BFF",          // Seamless legacy mapping to primary accent
-    goldDim: "#1E55E0",
-    border: "#3D3D37",        // Subtle Border
-    borderSubtle: "#2C2C29",
-    borderFocus: "#2F6BFF",
+    accentMuted: "rgba(16, 185, 129, 0.14)",
+    gold: "#10B981",          // Seamless legacy mapping
+    goldDim: "#059669",
+    border: "#26303D",        // Border
+    borderSubtle: "#1E2733",
+    borderFocus: "#10B981",
 
     // Status Semantics
-    green: "#4ADE80",
-    success: "#4ADE80",
+    green: "#34D399",
+    success: "#34D399",
     red: "#F87171",
     error: "#F87171",
     danger: "#F87171",
     warning: "#FBBF24",
     yellow: "#FBBF24",
-    blue: "#2F6BFF",
+    blue: "#60A5FA",
+    info: "#60A5FA",
     purple: "#A78BFA",
 
     // Charting Palette
     chart: {
-      primary: "#2F6BFF",     // Electric Blue
-      secondary: "#4ADE80",   // Success Green
-      tertiary: "#D8CBB3",    // Sand Neutral
-      quaternary: "#FBBF24", // Warning Gold
-      accent: "#A78BFA",      // Purple
-      grid: "#3D3D37",
-      tooltipBg: "#30302D",
+      primary: "#10B981",
+      secondary: "#34D399",
+      tertiary: "#60A5FA",
+      quaternary: "#FBBF24",
+      accent: "#A78BFA",
+      grid: "#26303D",
+      tooltipBg: "#1C2430",
     },
 
     ...common,
@@ -88,32 +84,27 @@ export const themes = {
   light: {
     name: "light",
     // Primary Brand Colors
-    cream: "#F3EEE3",
-    inkBlack: "#111111",
-    burntOrange: "#D9541E",
-
-    // Surfaces & Backgrounds
-    bg: "#F3EEE3",            // Cream Page Background
-    card: "#FAF7F0",          // Card Background
-    surface: "#FFFFFF",       // Elevated Surface
-    elevated: "#FFFFFF",
+    bg: "#F5F7FA",            // Primary light background
+    card: "#FFFFFF",          // Secondary surface card
+    surface: "#F8FAFC",       // Elevated surface
+    elevated: "#F8FAFC",
 
     // Typography
-    text: "#111111",          // Ink Black Primary Text
-    textSecondary: "#746D63", // Secondary Text
-    muted: "#746D63",
+    text: "#0F172A",          // Primary text
+    textSecondary: "#64748B", // Secondary text
+    muted: "#64748B",
 
     // Accents & Borders
-    primary: "#D9541E",       // Burnt Orange Brand Accent
-    accent: "#D9541E",
-    accentHover: "#B84314",
+    primary: "#047857",       // Primary accent (Deep Emerald)
+    accent: "#047857",
+    accentHover: "#065F46",
     accentForeground: "#FFFFFF",
-    accentMuted: "rgba(217, 84, 30, 0.12)",
-    gold: "#D9541E",          // Seamless legacy mapping to primary accent
-    goldDim: "#B84314",
-    border: "#DDD5C6",        // Subtle Border
-    borderSubtle: "#EAE3D6",
-    borderFocus: "#D9541E",
+    accentMuted: "rgba(4, 120, 87, 0.12)",
+    gold: "#047857",          // Seamless legacy mapping
+    goldDim: "#065F46",
+    border: "#E2E8F0",        // Border
+    borderSubtle: "#EEF2F6",
+    borderFocus: "#047857",
 
     // Status Semantics
     green: "#15803D",
@@ -123,17 +114,18 @@ export const themes = {
     danger: "#B91C1C",
     warning: "#92400E",
     yellow: "#92400E",
-    blue: "#2563EB",
+    blue: "#1D4ED8",
+    info: "#1D4ED8",
     purple: "#7C3AED",
 
     // Charting Palette
     chart: {
-      primary: "#D9541E",     // Burnt Orange
-      secondary: "#15803D",   // Deep Green
-      tertiary: "#111111",    // Ink Black
-      quaternary: "#92400E", // Warm Amber
-      accent: "#7C3AED",      // Violet
-      grid: "#DDD5C6",
+      primary: "#047857",
+      secondary: "#15803D",
+      tertiary: "#1D4ED8",
+      quaternary: "#92400E",
+      accent: "#7C3AED",
+      grid: "#E2E8F0",
       tooltipBg: "#FFFFFF",
     },
 

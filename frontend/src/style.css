@@ -5,41 +5,43 @@
 /* ── Centralized Semantic CSS Custom Properties ─────────────────────────── */
 :root,
 [data-theme='dark'] {
-  --bg-page: #1E1E1C;
-  --bg-card: #282826;
-  --bg-surface: #30302D;
-  --bg-elevated: #30302D;
-  --text-primary: #D8CBB3;
-  --text-secondary: #A8A294;
-  --text-muted: #A8A294;
-  --accent-primary: #2F6BFF;
-  --accent-hover: #1E55E0;
+  --bg-page: #0D1117;
+  --bg-card: #161B22;
+  --bg-surface: #1C2430;
+  --bg-elevated: #1C2430;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #94A3B8;
+  --accent-primary: #10B981;
+  --accent-hover: #059669;
   --accent-foreground: #FFFFFF;
-  --accent-muted: rgba(47, 107, 255, 0.14);
-  --border-color: #3D3D37;
-  --border-subtle: #2C2C29;
-  --color-success: #4ADE80;
+  --accent-muted: rgba(16, 185, 129, 0.14);
+  --border-color: #26303D;
+  --border-subtle: #1E2733;
+  --color-success: #34D399;
   --color-error: #F87171;
   --color-warning: #FBBF24;
+  --color-info: #60A5FA;
 }
 
 [data-theme='light'] {
-  --bg-page: #F3EEE3;
-  --bg-card: #FAF7F0;
-  --bg-surface: #FFFFFF;
-  --bg-elevated: #FFFFFF;
-  --text-primary: #111111;
-  --text-secondary: #746D63;
-  --text-muted: #746D63;
-  --accent-primary: #D9541E;
-  --accent-hover: #B84314;
+  --bg-page: #F5F7FA;
+  --bg-card: #FFFFFF;
+  --bg-surface: #F8FAFC;
+  --bg-elevated: #F8FAFC;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #64748B;
+  --accent-primary: #047857;
+  --accent-hover: #065F46;
   --accent-foreground: #FFFFFF;
-  --accent-muted: rgba(217, 84, 30, 0.12);
-  --border-color: #DDD5C6;
-  --border-subtle: #EAE3D6;
+  --accent-muted: rgba(4, 120, 87, 0.12);
+  --border-color: #E2E8F0;
+  --border-subtle: #EEF2F6;
   --color-success: #15803D;
   --color-error: #B91C1C;
   --color-warning: #92400E;
+  --color-info: #1D4ED8;
 }
 
 *, *::before, *::after { 
