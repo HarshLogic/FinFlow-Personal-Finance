@@ -526,8 +526,6 @@ ALPHA_VANTAGE_API_KEY=optional_demo_key
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 - **Financial Wisdom:** Rules in the Financial Rulebook are inspired by Morgan Housel's *The Psychology of Money*.
-- **Iconography:** Handcrafted with [Lucide React](https://lucide.dev/).
-- **Charting Engine:** Powered by [Recharts](https://recharts.org/).
 
 <div align="center">
   <sub>Built with precision engineering, financial discipline, and compound interest.</sub>
