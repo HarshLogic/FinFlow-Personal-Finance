@@ -10,6 +10,10 @@ const requireAuth = () => {
 
     const token = authHeader.split(" ")[1];
     try {
+      const isProd = process.env.NODE_ENV === "production";
+      if (isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.includes("fallback"))) {
+        return res.status(500).json({ error: "Server authentication configuration error" });
+      }
       const JWT_SECRET = process.env.JWT_SECRET || "finflow_dev_jwt_secret_fallback_2026";
       const decoded = jwt.verify(token, JWT_SECRET);
       req.auth = { userId: decoded.userId };

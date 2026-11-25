@@ -3,8 +3,6 @@ import { X, Send } from "lucide-react";
 import { themes } from "../shared";
 import { getSummary } from "../api";
 
-const C = themes.dark;
-
 const QA_KNOWLEDGE = [
   {
     keywords: ["what is finance flow", "about finance flow", "what do you do"],
@@ -65,7 +63,7 @@ const QA_KNOWLEDGE = [
   }
 ];
 
-export default function Chatbot({ isOpen, onClose }) {
+export default function Chatbot({ isOpen, onClose, C = themes.dark }) {
   const [messages, setMessages] = useState([
     { role: "assistant", text: "Hi! I'm your Finance Flow Assistant. How can I help you manage your finances today?" }
   ]);
@@ -212,11 +210,11 @@ export default function Chatbot({ isOpen, onClose }) {
               borderRadius: 16,
               borderBottomLeftRadius: msg.role === "assistant" ? 4 : 16,
               borderBottomRightRadius: msg.role === "user" ? 4 : 16,
-              backgroundColor: msg.role === "user" ? C.emerald : C.card,
-              color: msg.role === "user" ? "#000" : C.text,
+              backgroundColor: msg.role === "user" ? (C.accent || C.gold) : C.card,
+              color: msg.role === "user" ? "#FFFFFF" : C.text,
               fontSize: 13,
               lineHeight: 1.5,
-              border: msg.role === "assistant" ? `1px solid \${C.border}` : "none"
+              border: msg.role === "assistant" ? `1px solid ${C.border}` : "none"
             }}>
               {msg.text}
             </div>
@@ -250,9 +248,9 @@ export default function Chatbot({ isOpen, onClose }) {
               width: 38,
               height: 38,
               borderRadius: "50%",
-              backgroundColor: C.gold,
+              backgroundColor: C.accent || C.gold,
               border: "none",
-              color: "#000",
+              color: "#FFFFFF",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

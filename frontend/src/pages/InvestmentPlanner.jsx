@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { themes } from '../shared';
 
 // --- Static Currency & Asset Data ---
 const currencies = {
@@ -31,7 +32,7 @@ const investmentTypes = [
   { id: 'emergency_fund', name: 'Liquid Emergency Reserve', icon: '🛡️' },
 ];
 
-export default function InvestmentPlanner() {
+export default function InvestmentPlanner({ C = themes.dark }) {
   const [salary, setSalary] = useState('100000');
   const [currency, setCurrency] = useState('INR');
   const [investmentPercentage, setInvestmentPercentage] = useState(30);
@@ -79,34 +80,121 @@ export default function InvestmentPlanner() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 md:p-8 space-y-8 text-white font-sans">
+    <div
+      style={{
+        maxWidth: 1040,
+        margin: '0 auto',
+        paddingBottom: 48,
+        color: C.text,
+        fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif",
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 24,
+      }}
+    >
       {/* Header Banner */}
-      <div className="text-center space-y-3 pt-4">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/30 text-teal-400 text-2xl shadow-lg">
+      <div style={{ textAlign: 'center', paddingTop: 8, paddingBottom: 8 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 54,
+            height: 54,
+            borderRadius: 16,
+            background: `${C.accent}18`,
+            border: `1px solid ${C.accent}33`,
+            color: C.accent,
+            fontSize: 24,
+            marginBottom: 14,
+            boxShadow: C.shadowSm,
+          }}
+        >
           📈
         </div>
-        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-200 via-white to-emerald-400 bg-clip-text text-transparent">
+        <h1
+          style={{
+            fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.025em',
+            margin: 0,
+            color: C.text,
+          }}
+        >
           Finance Flow Investment Planner
         </h1>
-        <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">
+        <p
+          style={{
+            color: C.muted,
+            maxWidth: 580,
+            margin: '8px auto 0 auto',
+            fontSize: '0.92rem',
+            lineHeight: 1.5,
+          }}
+        >
           Allocate your monthly income across diverse asset classes and track your financial growth with precision.
         </p>
       </div>
 
       {/* Step 1: Salary & Savings Rate */}
-      <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
-        <div className="flex items-center gap-3 border-b border-zinc-800/80 pb-4">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-teal-500 text-black font-bold text-sm">
+      <div
+        style={{
+          background: C.card,
+          border: `1px solid ${C.border}`,
+          borderRadius: 16,
+          padding: '24px 28px',
+          boxShadow: C.shadowSm,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            borderBottom: `1px solid ${C.border}`,
+            paddingBottom: 14,
+          }}
+        >
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: C.accent,
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: 13,
+            }}
+          >
             1
           </span>
-          <h2 className="text-xl font-bold text-zinc-100">Monthly Income & Target Rate</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: C.text }}>
+            Monthly Income & Target Rate
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Net Monthly Salary / Inflow</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: C.muted, marginBottom: 6 }}>
+              Net Monthly Salary / Inflow
+            </label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  position: 'absolute',
+                  left: 14,
+                  color: C.muted,
+                  fontWeight: 600,
+                  fontSize: 15,
+                  pointerEvents: 'none',
+                }}
+              >
                 {selectedCurrency.symbol}
               </span>
               <input
@@ -114,22 +202,49 @@ export default function InvestmentPlanner() {
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
                 placeholder="e.g. 100000"
-                className="w-full bg-zinc-950 border border-zinc-700 rounded-xl py-2.5 pl-9 pr-4 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  background: C.surface,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 10,
+                  padding: '10px 14px 10px 36px',
+                  color: C.text,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  fontVariantNumeric: 'tabular-nums',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease',
+                }}
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Currency</label>
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: C.muted, marginBottom: 6 }}>
+              Currency
+            </label>
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-700 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-teal-500 transition-colors"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: C.surface,
+                border: `1px solid ${C.border}`,
+                borderRadius: 10,
+                padding: '10px 14px',
+                color: C.text,
+                fontSize: 14,
+                fontWeight: 600,
+                outline: 'none',
+                cursor: 'pointer',
+              }}
             >
               {Object.entries(currencies).map(([region, list]) => (
-                <optgroup key={region} label={region} className="bg-zinc-900 text-teal-400">
+                <optgroup key={region} label={region} style={{ background: C.card, color: C.accent }}>
                   {list.map((c) => (
-                    <option key={c.code} value={c.code} className="text-white">
+                    <option key={c.code} value={c.code} style={{ background: C.surface, color: C.text }}>
                       {c.code} ({c.symbol}) - {c.name}
                     </option>
                   ))}
@@ -139,10 +254,22 @@ export default function InvestmentPlanner() {
           </div>
         </div>
 
-        <div className="space-y-3 pt-2">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-300">Portion Allocated to Invest:</span>
-            <span className="font-semibold text-teal-400 text-base">{investmentPercentage}%</span>
+        <div style={{ paddingTop: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 13 }}>
+            <span style={{ color: C.muted, fontWeight: 500 }}>Portion Allocated to Invest:</span>
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: 14,
+                color: C.accent,
+                background: `${C.accent}18`,
+                padding: '2px 10px',
+                borderRadius: 6,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {investmentPercentage}%
+            </span>
           </div>
           <input
             type="range"
@@ -150,38 +277,113 @@ export default function InvestmentPlanner() {
             max="100"
             value={investmentPercentage}
             onChange={(e) => setInvestmentPercentage(Number(e.target.value))}
-            className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-teal-400"
+            style={{
+              width: '100%',
+              accentColor: C.accent,
+              cursor: 'pointer',
+              height: 6,
+            }}
           />
         </div>
 
-        <div className="bg-teal-950/30 border border-teal-500/20 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <span className="text-zinc-400 text-sm">Available Monthly Investment Pool:</span>
-          <span className="text-2xl font-bold text-teal-300 tracking-wide">
+        <div
+          style={{
+            background: `${C.accent}12`,
+            border: `1px solid ${C.accent}33`,
+            borderRadius: 12,
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          <span style={{ color: C.text, fontSize: 13, fontWeight: 600 }}>Available Monthly Investment Pool:</span>
+          <span
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: C.accent,
+              letterSpacing: '-0.01em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {formatCurrency(totalInvestmentFund)}
           </span>
         </div>
       </div>
 
       {/* Step 2: Allocation Percentage Matrix */}
-      <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
-        <div className="flex items-center gap-3 border-b border-zinc-800/80 pb-4">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-teal-500 text-black font-bold text-sm">
+      <div
+        style={{
+          background: C.card,
+          border: `1px solid ${C.border}`,
+          borderRadius: 16,
+          padding: '24px 28px',
+          boxShadow: C.shadowSm,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            borderBottom: `1px solid ${C.border}`,
+            paddingBottom: 14,
+          }}
+        >
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: C.accent,
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: 13,
+            }}
+          >
             2
           </span>
-          <h2 className="text-xl font-bold text-zinc-100">Asset Class Allocation</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: C.text }}>
+            Asset Class Allocation
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 12,
+          }}
+        >
           {investmentTypes.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-3.5 bg-zinc-950/60 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 16px',
+                background: C.surface,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                transition: 'border-color 0.2s ease',
+              }}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-zinc-200 text-sm font-medium">{item.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 22 }}>{item.icon}</span>
+                <span style={{ color: C.text, fontSize: 13, fontWeight: 600 }}>{item.name}</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input
                   type="number"
                   min="0"
@@ -189,9 +391,22 @@ export default function InvestmentPlanner() {
                   placeholder="0"
                   value={allocations[item.id] || ''}
                   onChange={(e) => handleAllocationChange(item.id, e.target.value)}
-                  className="w-16 bg-zinc-900 border border-zinc-700 rounded-lg py-1 px-2 text-center text-white focus:outline-none focus:border-teal-400 text-sm"
+                  style={{
+                    width: 54,
+                    boxSizing: 'border-box',
+                    background: C.card,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8,
+                    padding: '6px 8px',
+                    textAlign: 'center',
+                    color: C.text,
+                    fontWeight: 700,
+                    fontSize: 13,
+                    fontVariantNumeric: 'tabular-nums',
+                    outline: 'none',
+                  }}
                 />
-                <span className="text-zinc-500 text-sm">%</span>
+                <span style={{ color: C.muted, fontSize: 13, fontWeight: 600 }}>%</span>
               </div>
             </div>
           ))}
@@ -199,20 +414,37 @@ export default function InvestmentPlanner() {
 
         {/* Allocation Counter Bar */}
         <div
-          className={`p-4 rounded-xl border transition-all ${
-            isValidAllocation
-              ? 'bg-teal-950/30 border-teal-500/40 text-teal-300'
+          style={{
+            padding: '14px 18px',
+            borderRadius: 12,
+            border: `1px solid ${
+              isValidAllocation
+                ? `${C.green}44`
+                : totalAllocation > 100
+                ? `${C.red}44`
+                : `${C.warning}44`
+            }`,
+            background: isValidAllocation
+              ? `${C.green}14`
               : totalAllocation > 100
-              ? 'bg-red-950/30 border-red-500/40 text-red-300'
-              : 'bg-amber-950/30 border-amber-500/40 text-amber-300'
-          }`}
+              ? `${C.red}14`
+              : `${C.warning}14`,
+            color: isValidAllocation
+              ? C.green
+              : totalAllocation > 100
+              ? C.red
+              : C.warning,
+            transition: 'all 0.25s ease',
+          }}
         >
-          <div className="flex justify-between items-center text-sm font-semibold">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14, fontWeight: 700 }}>
             <span>Total Allocation:</span>
-            <span className="text-lg">{totalAllocation.toFixed(1)}% / 100%</span>
+            <span style={{ fontSize: 16, fontVariantNumeric: 'tabular-nums' }}>
+              {totalAllocation.toFixed(1)}% / 100%
+            </span>
           </div>
           {!isValidAllocation && (
-            <p className="text-xs mt-1.5 opacity-80">
+            <p style={{ margin: '6px 0 0 0', fontSize: 12, opacity: 0.9 }}>
               {totalAllocation > 100
                 ? `Exceeded by ${(totalAllocation - 100).toFixed(1)}%. Please reduce portfolio weights.`
                 : `Add ${(100 - totalAllocation).toFixed(1)}% more to complete your 100% plan.`}
@@ -223,15 +455,49 @@ export default function InvestmentPlanner() {
 
       {/* Step 3: Breakdown Results */}
       {isValidAllocation && totalInvestmentFund > 0 && (
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
-          <div className="flex items-center gap-3 border-b border-zinc-800/80 pb-4">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-teal-500 text-black font-bold text-sm">
+        <div
+          style={{
+            background: C.card,
+            border: `1px solid ${C.border}`,
+            borderRadius: 16,
+            padding: '24px 28px',
+            boxShadow: C.shadowSm,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              borderBottom: `1px solid ${C.border}`,
+              paddingBottom: 14,
+            }}
+          >
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: C.accent,
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
               3
             </span>
-            <h2 className="text-xl font-bold text-zinc-100">Monthly Investment Portfolio Breakdown</h2>
+            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: C.text }}>
+              Monthly Investment Portfolio Breakdown
+            </h2>
           </div>
 
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {Object.entries(allocations)
               .filter(([_, pct]) => parseFloat(pct) > 0)
               .map(([id, pct]) => {
@@ -240,18 +506,38 @@ export default function InvestmentPlanner() {
                 return (
                   <div
                     key={id}
-                    className="flex justify-between items-center p-3.5 bg-zinc-950/50 border border-zinc-800/80 rounded-xl hover:border-teal-500/30 transition-all"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '14px 18px',
+                      background: C.surface,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 12,
+                      transition: 'border-color 0.2s ease',
+                    }}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{item?.icon || '📁'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{ fontSize: 22 }}>{item?.icon || '📁'}</span>
                       <div>
-                        <div className="text-zinc-200 text-sm font-medium">{item?.name || id}</div>
-                        <div className="text-xs text-zinc-500">{parseFloat(pct).toFixed(1)}% share</div>
+                        <div style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>{item?.name || id}</div>
+                        <div style={{ fontSize: 12, color: C.muted, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+                          {parseFloat(pct).toFixed(1)}% share
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-teal-400 font-bold text-base">{formatCurrency(amount)}</div>
-                      <div className="text-zinc-500 text-xs">per month</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div
+                        style={{
+                          color: C.accent,
+                          fontWeight: 700,
+                          fontSize: 16,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {formatCurrency(amount)}
+                      </div>
+                      <div style={{ color: C.muted, fontSize: 11, marginTop: 2 }}>per month</div>
                     </div>
                   </div>
                 );

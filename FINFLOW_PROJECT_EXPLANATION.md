@@ -291,6 +291,77 @@ FinFlow includes **21 production-verified features**. Below is an in-depth break
 
 ---
 
+### Feature 22: Monthly Personal CA Report & Financial Health Audit
+- **Purpose:** Automated chartered accountant review of monthly cash flows, savings rates, commitment coverage, and wealth evolution.
+- **Inputs:** Income, personal expenses, active bank/wallet balances, recurring bills, mutual funds, stocks, FDs, and peer receivables.
+- **Processing Logic:**
+  - Evaluates an explainable 0–100 Financial Health Score based on 6 core factors: Savings Performance (25 pts), Budget Discipline (20 pts), Emergency Runway (20 pts), Debt & Obligations (15 pts), Investment Consistency (10 pts), Cash Flow Stability (10 pts).
+  - Categorizes spending into Needs vs. Wants, audits top expense categories, and compares metrics directly with the previous month.
+  - Generates prioritized recommendations (High/Medium/Low) with estimated monetary impacts.
+  - Generates downloadable professional 2-page PDF and formula-injection-safe CSV reports.
+- **Outputs:** Comprehensive monthly review dashboard, PDF document, and CSV export.
+- **Practical Value:** Answers whether you are saving enough, spending sustainably, and on track for long-term wealth.
+
+---
+
+### Feature 23: Can I Afford It? — Smart Purchase Simulator
+- **Purpose:** Fast, 100% deterministic mathematical decision engine determining whether a planned purchase is safely affordable today without AI dependencies.
+- **Inputs:** Product name, price, monthly income, essential expenses, existing EMIs, planned savings, liquid bank balance, other unpaid commitments, emergency fund target (3 or 6 months), and optional EMI financing parameters (down payment, annual interest rate, tenure in months, processing fees, upfront charges).
+- **Processing Logic:**
+  - Evaluates monthly disposable income ($I_{\text{disposable}} = I - E - D - S$).
+  - Computes required emergency reserve target ($F_{\text{emergency}} = (E + D) \times M$).
+  - Calculates unreserved spending balance ($\text{availableSpendingBalance} = \max(0, B - F_{\text{emergency}} - C)$).
+  - Two dedicated payment modes:
+    - **Full Payment:** Evaluates affordability ratio against unreserved balance (0-25% COMFORTABLY AFFORDABLE, 25-50% AFFORDABLE, 50-100% RISKY, >100% NOT AFFORDABLE; cash deficit downgrades to RISKY).
+    - **EMI Payment:** Computes reducing-balance EMI ($P \times \frac{r(1+r)^n}{(1+r)^n-1}$), evaluates EMI vs disposable income, and checks debt-to-income ($\le 30\%$).
+  - Determines canonical status: `COMFORTABLY_AFFORDABLE`, `AFFORDABLE`, `RISKY`, `NOT_AFFORDABLE`, `INSUFFICIENT_DATA`.
+  - Calculates savings timeline and funding gap: $\text{monthsRequired} = \lceil \text{totalFundingGap} / I_{\text{disposable}} \rceil$.
+  - "Use My FinFlow Data" prefills live records; "Convert to Savings Goal" seamlessly translates unaffordable items into active savings plans.
+- **Outputs:** Canonical status badge, Before vs After financial comparison, EMI cost schedule, specific numerical reasons, and savings timeline.
+- **Practical Value:** Eliminates buyer's remorse and protects emergency buffers against impulse spending with mathematical certainty.
+
+---
+
+### Feature 24: Financial Milestones & Foundation Score
+- **Purpose:** Tracks fundamental financial defense shields with a dedicated 0–100 Financial Foundation Score.
+- **Inputs:** Self-reported completion of Emergency Fund (50 pts) and Health Insurance (50 pts).
+- **Processing Logic:**
+  - Strictly separates foundation protection from transactional Financial Health Score.
+  - Backend score validation and persistence in MongoDB (`FinancialFoundation`).
+  - Score classifications: 0 ("Starting Your Financial Journey"), 50 ("Building Your Financial Foundation"), 100 ("Financial Foundation Complete").
+  - Unchecking removes 50 points; duplicate submissions never accumulate points.
+  - Generates personalized next steps dynamically based on current completion status.
+- **Outputs:** Circular score gauge, progress bar, milestone status cards, and contextual advice.
+- **Practical Value:** Ensures users protect themselves against life's primary financial shocks before investing aggressively.
+
+---
+
+### Feature 25: First-Login Financial Foundation Onboarding Popup
+- **Purpose:** Welcomes new users immediately after authentication with a clean, non-blocking onboarding modal.
+- **Inputs:** Authenticated user registration (supports both email/password and Google OAuth).
+- **Processing Logic:**
+  - Checks onboarding status on login (`GET /api/financial-foundation`).
+  - If status is `NOT_STARTED`, displays the modal: *"Build Your Financial Foundation"*.
+  - Features real-time score calculation as checkboxes are toggled (0 $\rightarrow$ 50 $\rightarrow$ 100).
+  - "Save & Continue" persists selections and marks `COMPLETED`; "Skip for Now" dismisses without blocking dashboard.
+  - State persisted on backend so the popup never repeatedly displays.
+- **Outputs:** Responsive onboarding modal with live score feedback and non-blocking navigation.
+- **Practical Value:** Sets a strong tone of financial discipline from day one.
+
+---
+
+### Feature 26: Financial Rulebook (28 Rules) & 12 Interactive Calculators
+- **Purpose:** Digital repository of 28 timeless personal finance principles inspired by Morgan Housel (*The Psychology of Money*), featuring interactive calculators.
+- **Inputs:** Category selection, keyword search queries, and custom numeric inputs for calculators.
+- **Processing Logic:**
+  - 5 Categorical pillars: Financial Protection (Rules 01–05), Budgeting and Spending (Rules 06–11), Investments and Wealth Building (Rules 12–18), Loans and Major Purchases (Rules 19–22), Long-Term Financial Planning (Rules 23–28).
+  - 12 Interactive calculators: Emergency Fund, Term Life, 50/30/20, 5% Fun Money, SIP & Compound Growth, Rule of 72, Inflation & Real Return, 20/4/10 Car Rule, EMI Ratio, 25x FIRE Corpus, 4% Safe Withdrawal, Net Worth.
+  - Zero-division, non-negative, and NaN protection; simulation-only calculations without ledger mutations.
+- **Outputs:** Searchable accordion cards with formulas, INR examples, assumptions, and interactive calculation widgets.
+- **Practical Value:** Educates users on foundational financial psychology and gives them hands-on calculation tools.
+
+---
+
 ## 3. HOW FINFLOW WORKS — STEP-BY-STEP USER JOURNEY
 
 ```mermaid
@@ -686,8 +757,61 @@ To maintain full transparency, here is the clear distinction between what is **c
 | [x] Secure JWT Authentication & Session Engine                     |                                    |
 | [x] Consolidated /api/summary Route                                |                                    |
 | [x] Glassmorphic Responsive Dark UI                                |                                    |
+| [x] Monthly Personal CA Report & Financial Health Review           |                                    |
+| [x] Can I Afford It? — Smart Purchase Simulator                    |                                    |
+| [x] Reducing-Balance EMI & Loan Cost Calculator                    |                                    |
+| [x] PDF & Formula-Injection Safe CSV Exporters                     |                                    |
+| [x] Purchase-to-Savings Goal Conversion Engine                     |                                    |
 +--------------------------------------------------------------------+------------------------------------+
 ```
 
 ---
-*Documentation compiled and verified for FinFlow v2.0.*
+
+## 15. NEW ENTERPRISE MODULES (v2.1)
+
+### 15.1 Monthly Personal CA Report & Financial Health Review
+The **Monthly Personal CA Report** functions as an automated digital Chartered Accountant. It conducts an audit of monthly inflows, personal consumption expenses, savings rate, 50-30-20 budget compliance, recurring debt commitments, and liquid reserves.
+
+#### A. Architecture & Data Flow
+1. **Data Ingestion:** Reads all transaction records from `Income`, `Expense`, `Account`, `RecurringObligation`, `BudgetCycle`, `Stock`, `MutualFund`, `FixedDeposit`, and `SplitExpense`.
+2. **Transfer Sanitization:** Internal transfers between user accounts are isolated to prevent double counting. Peer debt settlements are credited to cash accounts without inflating earned income. Investment contributions (category "Savings") are separated from consumption expenses.
+3. **Financial Health Scoring (0–100):**
+   - **Savings Performance (25 pts):** Benchmarked against the 20% golden savings standard.
+   - **Budget Discipline (20 pts):** Audits essential (Need) vs. discretionary (Want) spend; penalizes lifestyle creep (> 35% Wants).
+   - **Emergency Fund Runway (20 pts):** Evaluates liquid buffer against essential monthly expenses (3–6 months = top score).
+   - **Debt & Fixed Commitments (15 pts):** Ratio of fixed obligations to income (< 45% = safe).
+   - **Investment Consistency (10 pts):** Active mutual fund SIPs, stocks, or fixed deposits.
+   - **Cash Flow Stability (10 pts):** Positive net cash flow.
+4. **Explainable Recommendations:** Rule-based decision tree generates High, Medium, and Low priority action plans with estimated monetary impacts.
+5. **Zero-Dependency PDF & Safe CSV Generation:**
+   - PDF generated using native Node.js PDF-1.4 stream builder (`SimplePDFBuilder`) with typography, KPI grids, score badges, and regulatory disclosures.
+   - CSV generator protects against spreadsheet formula injection (CWE-1236) by prepending `'` to risky prefixes (`=`, `+`, `-`, `@`).
+6. **Automated Monthly Cron:** `cron.schedule('0 2 1 * *')` runs on the 1st of every month to finalize the previous month's report.
+
+---
+
+### 15.2 Can I Afford It? — Smart Purchase Simulator
+The **Smart Purchase Simulator** prevents impulse spending by projecting the exact financial impact of a purchase before money leaves the user's account.
+
+#### A. Affordability Formula
+Reuses the battle-tested Safe-to-Spend algorithm:
+$$\text{Available Purchase Capacity} = \max(0, \text{Liquid Cash} - \text{Unpaid Bills} - \text{Remaining Savings Target} - \text{Safety Buffer})$$
+
+#### B. Multi-Mode Payment Analysis
+1. **Upfront Payment:** Immediate cost is deducted from liquid balance. Post-purchase daily allowance is recomputed for remaining cycle days.
+2. **Reducing-Balance EMI Simulator:**
+   $$\text{EMI} = P \times r \times \frac{(1 + r)^n}{(1 + r)^n - 1}$$
+   Where $P = \text{Price} - \text{Down Payment}$, $r = \frac{\text{Annual Rate}}{12 \times 100}$, $n = \text{Tenure Months}$.
+   Zero-interest (No-Cost EMI) mode: $\text{EMI} = \frac{P}{n}$.
+3. **Credit Card:** Tracks repayment commitments due in the subsequent billing cycle.
+
+#### C. Decision Verdicts
+- **SAFE TO BUY (Green):** Purchase is fully covered by uncommitted funds; bills, savings, and safety buffer remain 100% intact.
+- **BUY WITH CAUTION (Amber):** Purchase can be made from cash, but will absorb part of monthly savings or tighten daily spending allowance.
+- **NOT AFFORDABLE RIGHT NOW (Red):** Purchase creates a cash shortfall or breaches the protected emergency buffer.
+
+#### D. Convert to Savings Goal
+If an item is unaffordable or requires caution, users can click **Convert to Savings Goal**. This creates an active milestone in `SavingsGoal` pre-populated with target amounts, suggested monthly contributions, and estimated completion timelines without modifying actual ledger balances.
+
+---
+*Documentation compiled and verified for FinFlow v2.1.*

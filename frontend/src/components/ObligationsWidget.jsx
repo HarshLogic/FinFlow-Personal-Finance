@@ -384,7 +384,7 @@ export default function ObligationsWidget({ C, currency, obligationsData = [], o
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.gold, color: "#0D0F14", fontWeight: 700, cursor: "pointer" }}
+                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.accent || C.gold, color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}
                 >
                   {loading ? "Adding..." : "Add Obligation"}
                 </button>
@@ -481,7 +481,7 @@ export default function ObligationsWidget({ C, currency, obligationsData = [], o
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.green, color: "#0D0F14", fontWeight: 700, cursor: "pointer" }}
+                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.green, color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}
                 >
                   {loading ? "Recording..." : "Confirm Payment"}
                 </button>

@@ -4,9 +4,7 @@ import { changePassword } from "../api";
 import { common, themes } from "../shared";
 import { User, Mail, Shield, Calendar, Key, AlertCircle, CheckCircle } from "lucide-react";
 
-const C = themes.dark;
-
-export default function UserProfile() {
+export default function UserProfile({ C = themes.dark }) {
   const { user } = useAuth();
   
   const [currentPassword, setCurrentPassword] = useState("");
@@ -165,11 +163,13 @@ export default function UserProfile() {
                 disabled={loading}
                 style={{
                   ...common.button,
-                  background: C.gold,
-                  color: "#0D0F14",
+                  background: C.accent || C.gold,
+                  color: "#FFFFFF",
                   fontWeight: 600,
                   marginTop: 8,
                   padding: "12px 16px",
+                  borderRadius: 8,
+                  border: "none",
                   opacity: loading ? 0.7 : 1,
                   cursor: loading ? "not-allowed" : "pointer"
                 }}

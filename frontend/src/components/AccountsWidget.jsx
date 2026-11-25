@@ -268,7 +268,7 @@ export default function AccountsWidget({ C, currency, accounts = [], onRefresh }
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.gold, color: "#0D0F14", fontWeight: 700, cursor: "pointer" }}
+                  style={{ flex: 1, padding: 9, borderRadius: 8, border: "none", background: C.accent || C.gold, color: "#FFFFFF", fontWeight: 700, cursor: "pointer" }}
                 >
                   {loading ? "Adding..." : "Add Account"}
                 </button>

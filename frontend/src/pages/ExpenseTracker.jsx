@@ -578,11 +578,11 @@ const add = async () => {
               padding: "9px 20px",
               background: saving
                 ? C.goldDim
-                : C.gold,
-              color: "#0D0F14",
+                : (C.accent || C.gold),
+              color: "#FFFFFF",
               border: "none",
               borderRadius: 8,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 13,
               cursor: saving
                 ? "not-allowed"

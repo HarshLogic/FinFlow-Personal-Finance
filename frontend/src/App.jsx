@@ -7,13 +7,30 @@ import WealthProjection from "./pages/WealthProjection";
 import InvestmentPlanner from "./pages/InvestmentPlanner";
 import UserProfile from "./pages/UserProfile";
 import LandingPage from "./pages/LandingPage";
+import MonthlyCAReport from "./pages/MonthlyCAReport";
+import PurchaseSimulator from "./pages/PurchaseSimulator";
+import FinancialMilestones from "./pages/FinancialMilestones";
+import FinancialRulebook from "./pages/FinancialRulebook";
 import Chatbot from "./components/Chatbot";
+import OnboardingModal from "./components/OnboardingModal";
 import { themes, common } from "./shared";
+import { getFinancialFoundation } from "./api";
 
 // We use SignedIn and SignedOut directly from Clerk
 import { useAuth } from "./context/AuthContext";
 
-import { LayoutDashboard, Receipt, Briefcase, TrendingUp, LineChart, User } from "lucide-react";
+import {
+  LayoutDashboard,
+  Receipt,
+  Briefcase,
+  TrendingUp,
+  LineChart,
+  User,
+  FileText,
+  ShoppingCart,
+  ShieldCheck,
+  BookOpen,
+} from "lucide-react";
 
 
 const NAV = [
@@ -22,6 +39,10 @@ const NAV = [
   { id: "portfolio", icon: <Briefcase size={20} strokeWidth={1.5} />, label: "Portfolio" },
   { id: "projection", icon: <TrendingUp size={20} strokeWidth={1.5} />, label: "Projections" },
   { id: "planner", icon: <LineChart size={20} strokeWidth={1.5} />, label: "Invest Planner" },
+  { id: "ca-report", icon: <FileText size={20} strokeWidth={1.5} />, label: "Monthly CA Report" },
+  { id: "affordability", icon: <ShoppingCart size={20} strokeWidth={1.5} />, label: "Can I Afford It?" },
+  { id: "milestones", icon: <ShieldCheck size={20} strokeWidth={1.5} />, label: "Milestones" },
+  { id: "rulebook", icon: <BookOpen size={20} strokeWidth={1.5} />, label: "Rulebook" },
 ];
 
 const TITLES = {
@@ -30,6 +51,10 @@ const TITLES = {
   portfolio: "Portfolio Manager",
   projection: "Wealth Projections",
   planner: "Investment Planner",
+  "ca-report": "Monthly Personal CA Report",
+  "affordability": "Can I Afford It? Purchase Simulator",
+  milestones: "Financial Milestones & Foundation",
+  rulebook: "Financial Rulebook (28 Rules)",
 };
 
 export default function App() {
@@ -46,9 +71,12 @@ export default function App() {
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [currency, setCurrency] = useState(localStorage.getItem("currency") || "INR");
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.backgroundColor = themes[theme]?.bg || (theme === "dark" ? "#1E1E1C" : "#F3EEE3");
   }, [theme]);
 
   useEffect(() => {
@@ -64,9 +92,27 @@ export default function App() {
     projection: WealthProjection,
     planner: InvestmentPlanner,
     profile: UserProfile,
+    "ca-report": MonthlyCAReport,
+    "affordability": PurchaseSimulator,
+    milestones: FinancialMilestones,
+    rulebook: FinancialRulebook,
   }[page];
 
   const { user, loading, logout } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      getFinancialFoundation()
+        .then((res) => {
+          if (res.data?.data?.onboarding?.status === "NOT_STARTED") {
+            setShowOnboarding(true);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to check onboarding state:", err);
+        });
+    }
+  }, [user]);
 
   if (loading) return <div style={{ color: "white", padding: 20 }}>Loading...</div>;
 
@@ -144,23 +190,21 @@ export default function App() {
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
-                    padding: "11px 12px",
-                    borderRadius: 10,
+                    padding: "10px 14px",
+                    borderRadius: 8,
                     border: "none",
                     cursor: "pointer",
                     textAlign: "left",
                     width: isMobile ? "auto" : "100%",
-                    background: page === n.id ? C.gold + "22" : "transparent",
-                    transform: page === n.id ? "scale(1.02)" : "scale(1)",
-                    boxShadow: page === n.id ? "0 0 12px rgba(240, 223, 20, 0.35)" : "none",
-                    color: page === n.id ? C.gold : C.muted,
-                    borderLeft: page === n.id ? `3px solid ${C.gold}` : "3px solid transparent",
-                    transition: "all 0.15s",
+                    background: page === n.id ? C.accentMuted || (theme === "dark" ? "rgba(47, 107, 255, 0.14)" : "rgba(217, 84, 30, 0.12)") : "transparent",
+                    color: page === n.id ? C.accent : C.muted,
+                    borderLeft: page === n.id ? `3px solid ${C.accent}` : "3px solid transparent",
+                    transition: "all 0.18s ease",
                   }}
                 >
                   <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{n.icon}</span>
                   {!collapsed && (
-                    <span style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 13, fontWeight: page === n.id ? 700 : 500, whiteSpace: "nowrap" }}>
                       {n.label}
                     </span>
                   )}
@@ -264,20 +308,35 @@ export default function App() {
                     gap: 6,
                     fontSize: 13,
                     fontWeight: 600,
-                    color: page === "profile" ? "#0D0F14" : C.text,
-                    background: page === "profile" ? C.gold : C.surface,
-                    border: `1px solid ${page === "profile" ? C.gold : C.border}`,
-                    padding: "6px 14px",
-                    borderRadius: 20,
+                    color: page === "profile" ? (theme === "dark" ? "#FFFFFF" : "#FFFFFF") : C.text,
+                    background: page === "profile" ? C.accent : C.card,
+                    border: `1px solid ${page === "profile" ? C.accent : C.border}`,
+                    padding: "7px 14px",
+                    borderRadius: 10,
                     cursor: "pointer",
-                    transition: "all 0.2s"
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  <User size={16} />
+                  <User size={15} />
                   User Profile
                 </button>
                 {/* ── CUSTOM USER BUTTON ── */}
-                <button onClick={logout} style={{ padding: "6px 12px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.red + "22", color: C.red, cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>Logout</button>
+                <button 
+                  onClick={logout} 
+                  style={{ 
+                    padding: "7px 14px", 
+                    borderRadius: 10, 
+                    border: `1px solid ${C.error}33`, 
+                    background: `${C.error}15`, 
+                    color: C.error, 
+                    cursor: "pointer", 
+                    fontSize: "13px", 
+                    fontWeight: 600,
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  Logout
+                </button>
               </div>
             </header>
 
@@ -290,7 +349,7 @@ export default function App() {
                 padding: isMobile ? "12px" : "24px 28px",
               }}
             >
-              <PageComponent C={C} currency={currency} />
+              <PageComponent C={C} currency={currency} setPage={setPage} />
             </main>
           </div>
 
@@ -323,9 +382,9 @@ export default function App() {
                     border: "none",
                     background: "transparent",
                     cursor: "pointer",
-                    color: page === n.id ? C.gold : C.muted,
-                    borderTop: page === n.id ? `2px solid ${C.gold}` : "2px solid transparent",
-                    transition: "all 0.15s",
+                    color: page === n.id ? C.accent : C.muted,
+                    borderTop: page === n.id ? `2px solid ${C.accent}` : "2px solid transparent",
+                    transition: "all 0.15s ease",
                   }}
                 >
                   <span style={{ fontSize: 20, lineHeight: 1 }}>{n.icon}</span>
@@ -362,7 +421,13 @@ export default function App() {
             </div>
           )}
           
-          <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+          <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} C={C} />
+          <OnboardingModal
+            isOpen={showOnboarding}
+            onClose={() => setShowOnboarding(false)}
+            onCompleted={() => setShowOnboarding(false)}
+            C={C}
+          />
         </div>
       )}
     </>

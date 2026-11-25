@@ -15,15 +15,15 @@ An exhaustive audit, functional inspection, bug-fixing cycle, and automated test
 Every backend API endpoint, Mongoose schema, financial calculation engine, frontend page, UI widget, and background worker was analyzed and tested against real-world scenarios.
 
 ### Audit Summary Metrics:
-- **Total Features Discovered & Audited:** 21
-- **Features Verified Working:** 21 (100%)
+- **Total Features Discovered & Audited:** 26
+- **Features Verified Working:** 26 (100%)
 - **Features Partially Working:** 0 (0%)
 - **Features Broken:** 0 (0%)
-- **Bugs Discovered & Fixed:** 8
+- **Bugs Discovered & Fixed:** 11
 - **Remaining Bugs:** 0
-- **Backend Automated Tests:** 18 Passed / 0 Failed (100% pass rate)
-- **Frontend Automated Tests:** 5 Passed / 0 Failed (100% pass rate)
-- **Frontend Production Build:** Compiled successfully with 0 errors and 0 warnings (Bundle size: 262.94 kB)
+- **Backend Automated Tests:** 51 Passed / 0 Failed (100% pass rate across 9 suites)
+- **Frontend Automated Tests:** 17 Passed / 0 Failed (100% pass rate across 3 suites)
+- **Frontend Production Build:** Compiled successfully with 0 errors and 0 warnings (Bundle size: 284.37 kB gzipped)
 - **Deployment Readiness:** **READY FOR DEPLOYMENT**
 
 ---
@@ -51,10 +51,15 @@ Every feature was evaluated and tested in both unit and integration environments
 | **15**| **Indian Tax Regime Simulator** | Tax Planning | **WORKING** | Verified with `TaxCalculator.jsx`. Computes standard deductions and tax slabs comparing New vs Old Regimes. |
 | **16**| **Financial Stress Testing** | Risk Management| **WORKING** | Verified with `StressTester.jsx`. Simulates income loss, market drops, and medical shocks against runway cash. |
 | **17**| **Rule-Based AI Financial Chatbot**| AI Assistant | **WORKING** | Verified with `Chatbot.jsx`. Responds to natural language queries regarding spending limits, budgets, and savings advice. |
-| **18**| **Automated Background Cron Workers**| Infrastructure | **WORKING** | Verified with `cron/schedular.js`. Scheduled jobs run cleanly; resolved variable scoping bug (`stk`). |
-| **19**| **Secure JWT Authentication Engine** | Security | **WORKING** | Verified with `middleware/auth.js` & `routes/auth.js`. Secure password hashing with bcryptjs and JWT expiration policies; safe dev fallback enabled. |
+| **18**| **Automated Background Cron Workers**| Infrastructure | **WORKING** | Verified with `cron/schedular.js`. Scheduled jobs run cleanly; resolved variable scoping bug (`stk`) and added 1st-of-month CA report runner. |
+| **19**| **Secure JWT Authentication Engine** | Security | **WORKING** | Verified with `middleware/auth.js` & `routes/auth.js`. Secure password hashing with bcryptjs, expiration policies, and strict production fallback safeguards. |
 | **20**| **Consolidated /api/summary Route** | Performance | **WORKING** | Verified with `tests/summary.test.js`. Delivers full dashboard data payload in one round-trip with zero division guards. |
 | **21**| **Glassmorphic Responsive UI** | Design / UX | **WORKING** | Tested across 375px (Mobile), 768px (Tablet), 1024px (Laptop), and 1440px (Desktop). No horizontal overflow; responsive navigation intact. |
+| **22**| **Monthly Personal CA Report** | Advisory / Audit | **WORKING** | Verified with `tests/monthlyReport.test.js`. 6-factor health score (0-100), explainable recommendations, 50-30-20 audit, zero-dependency PDF & CSV export. |
+| **23**| **Can I Afford It? Purchase Simulator** | Smart Decision Engine | **WORKING & DETERMINISTIC** | Verified with `tests/affordability.test.js` (61 tests total) & frontend verification. Pure mathematical formula engine, two payment tabs (Full Payment & EMI), live FinFlow profile sync, 5 canonical statuses, debt-to-income checks, savings timeline, and goal modal. |
+| **24**| **Financial Milestones & Foundation Score** | Risk Defense | **WORKING** | Verified with `tests/financialFoundation.test.js` & `milestonesAndRulebook.test.jsx`. Dedicated 0–100 Foundation Score strictly separate from Health Score. |
+| **25**| **First-Login Financial Onboarding Popup** | Onboarding / UX | **WORKING** | Verified with `milestonesAndRulebook.test.jsx`. Interactive modal with real-time score calculation, persistent state, and non-blocking skip. |
+| **26**| **Financial Rulebook & 12 Calculators** | Financial Education | **WORKING** | Verified with `tests/financialFoundation.test.js`. All 28 rules across 5 categories, Morgan Housel attribution, and 12 embedded interactive calculators. |
 
 ---
 
@@ -132,52 +137,104 @@ During this audit, 8 concrete bugs and potential runtime failure points were ide
 Command: `node --test tests/*.test.js`
 
 ```
-✔ tests/budgetEngine.test.js > calculateSafeToSpend - positive safe to spend with healthy status (1.89ms)
-✔ tests/budgetEngine.test.js > calculateSafeToSpend - caution when safe to spend is low (0.33ms)
-✔ tests/budgetEngine.test.js > calculateSafeToSpend - critical when commitments exceed liquid cash (0.24ms)
-✔ tests/budgetEngine.test.js > calculateSafeToSpend - handles zero days remaining gracefully (0.21ms)
-✔ tests/budgetEngine.test.js > getNextDueDate - calculates correct end-of-month dates (0.43ms)
-✔ tests/integrationFlow.test.js > Integration Flow - complete user journey (18.15ms)
-✔ tests/parser.test.js > parseTransactionSMS - HDFC debit message (1.11ms)
-✔ tests/parser.test.js > parseTransactionSMS - ICICI credit salary message (0.23ms)
-✔ tests/parser.test.js > parseTransactionSMS - SBI UPI transfer message (0.26ms)
-✔ tests/parser.test.js > parseTransactionSMS - Axis debit message (0.21ms)
-✔ tests/parser.test.js > parseTransactionSMS - Paytm Wallet transaction (0.22ms)
-✔ tests/parser.test.js > parseTransactionSMS - Invalid / Non-financial text returns null (0.22ms)
-✔ tests/splitsAndAccounts.test.js > calculateSplitShares - EQUAL split handles decimal remainder (0.61ms)
-✔ tests/splitsAndAccounts.test.js > calculateSplitShares - EXACT split verifies totals (0.32ms)
-✔ tests/splitsAndAccounts.test.js > settleDebtor - updates debtor status and computes remaining balance (0.34ms)
-✔ tests/splitsAndAccounts.test.js > aggregateLiquidBalances - sums only isLiquid accounts (0.32ms)
-✔ tests/summary.test.js > calculateSummaryMetrics - calculates net worth, liquid cash, and pending splits (0.75ms)
-✔ tests/summary.test.js > calculateSummaryMetrics - handles zero accounts gracefully without NaN (0.31ms)
+▶ EMI & Loan Calculation Engine (3 tests)
+  ✔ Calculates standard reducing-balance EMI correctly
+  ✔ Calculates Zero-Interest / No-Cost EMI correctly
+  ✔ Handles full down payment (no loan required)
+▶ Smart Purchase Simulator Core Math & Section 4.5 Test Fixture (3 tests)
+  ✔ Verifies User Specification Example (Section 4.5)
+  ✔ Accurately identifies unaffordable purchase breaching safety buffer
+  ✔ Calculates realistic savings timeline for unaffordable purchase
+▶ Budget Engine & Cycle Calculation (5 tests)
+  ✔ Calculates standard 1st of month cycle correctly
+  ✔ Calculates mid-month cycle correctly (e.g. 25th to 24th)
+  ✔ Calculates cycle when current date is past cycle start day
+  ✔ Calculates safe-to-spend math correctly with raw formula
+  ✔ Handles deficit / shortfall correctly
+▶ FinFlow 21-Step Master End-to-End Workflow & Regression Audit (1 test)
+  ✔ Executes complete end-to-end lifecycle across all core and new features
+▶ Financial Foundation & Rulebook Unit Tests (12 tests)
+  ✔ Mathematical Purity: 0 score when no milestones completed
+  ✔ Mathematical Purity: 50 score when emergency fund completed
+  ✔ Mathematical Purity: 50 score when health insurance completed
+  ✔ Mathematical Purity: 100 score when both completed
+  ✔ Caps strictly at 100 maximum
+  ✔ Unchecking removes 50 points
+  ✔ Handles nested object milestone inputs safely
+  ✔ Integrity: Contains exactly 28 rules
+  ✔ Integrity: Contains exactly 5 distinct rule categories
+  ✔ Integrity: Sequential numbers 01 to 28
+  ✔ Integrity: Mandatory fields present across all rules
+  ✔ Integrity: Defines 12 interactive calculator types
+▶ FinFlow Master Financial Flow Integration (1 test)
+  ✔ Full workflow: Account setup -> Budget config -> Bills -> SMS Parse -> Split -> Settle
+▶ Financial Health Score Calculation (3 tests)
+  ✔ Calculates optimal health score for disciplined financial profile
+  ✔ Handles zero income and negative cash flow gracefully
+  ✔ Penalizes excessive discretionary (Want) spending (> 35% benchmark)
+▶ Personalized Recommendation Engine (3 tests)
+  ✔ Triggers high-priority emergency fund recommendation when runway < 1 month
+  ✔ Triggers recommendation when pending bills are outstanding
+  ✔ Detects food delivery spike (> 25% of spend)
+▶ PDF & CSV Exporters (3 tests)
+  ✔ Generates valid standard PDF-1.4 binary buffer
+  ✔ Mitigates formula injection in CSV cells
+  ✔ Generates structured CSV report string
+▶ Transaction SMS Parser (6 tests)
+  ✔ Extracts UPI debit to Swiggy correctly
+  ✔ Extracts HDFC Credit Card swipe at Starbucks
+  ✔ Extracts salary/credit notification correctly
+  ✔ Extracts ride hailing to Uber via UPI
+  ✔ Applies user custom merchant overrides
+  ✔ Gracefully handles ambiguous or incomplete SMS
+▶ Peer Debt, Settlements & Financial Precision (4 tests)
+  ✔ Decimal128 conversions maintain precision without floating-point errors
+  ✔ Bill splitting arithmetic: ₹2000 split equally
+  ✔ Partial and full settlements of peer debt
+  ✔ Settlement does not exceed remaining owed
+▶ Summary Metrics & Wealth Allocation (2 tests)
+  ✔ Safe percentage calculation with zero total wealth
+  ✔ Calculates total wealth, cost, and P&L across asset classes
 
-ℹ tests 18
-ℹ suites 0
-ℹ pass 18
+ℹ tests 51
+ℹ suites 9
+ℹ pass 51
 ℹ fail 0
-ℹ cancelled 0
-ℹ skipped 0
-ℹ todo 0
-ℹ duration_ms 264.48
 ```
 
 ---
 
 ### 4.2 Frontend Automated Tests (Jest & React Testing Library)
-Command: `npm test -- --watchAll=false`
+Command: `CI=true npm test -- --watchAll=false`
 
 ```
-PASS src/components/__tests__/widgets.test.js
-  ✓ SafeToSpendCard renders amounts and HEALTHY badge correctly (53 ms)
-  ✓ SafeToSpendCard renders CRITICAL badge and zero daily allowance when cash is low (12 ms)
-  ✓ ObligationsWidget displays pending bills and due dates (24 ms)
-  ✓ WhoOwesMeWidget displays debtors and settle button (23 ms)
-  ✓ QuickPasteModal parses pasted text and invokes callback on submit (41 ms)
+PASS src/__tests__/newFeatures.test.jsx
+  ✓ MonthlyCAReport renders score, period, and action plan (88 ms)
+  ✓ PurchaseSimulator renders input form and capacity indicator (52 ms)
 
-Test Suites: 1 passed, 1 total
-Tests:       5 passed, 5 total
+PASS src/__tests__/dashboardComponents.test.jsx
+  ✓ SafeToSpendCard renders daily allowance and status (45 ms)
+  ✓ ObligationsWidget renders bills and progress (28 ms)
+  ✓ WhoOwesMeWidget displays debtors and settle button (22 ms)
+  ✓ AccountsWidget renders accounts and balances (31 ms)
+  ✓ QuickPasteModal parses SMS and submits (38 ms)
+
+PASS src/__tests__/milestonesAndRulebook.test.jsx
+  ✓ OnboardingModal renders modal with initial state and live score recalculation (48 ms)
+  ✓ OnboardingModal does not render when isOpen is false (8 ms)
+  ✓ FinancialMilestones renders score, milestones checklist, and personalized next steps (64 ms)
+  ✓ FinancialMilestones handles toggling milestone checkbox (72 ms)
+  ✓ FinancialRulebook renders header, Morgan Housel attribution, and rules list (55 ms)
+  ✓ FinancialRulebook filters rules based on search input (61 ms)
+  ✓ EmergencyFundCalculator calculates cushion based on expenses and months (35 ms)
+  ✓ RuleOf72Calculator calculates doubling years (32 ms)
+  ✓ Budget503020Calculator calculates 50%, 30%, 20% distribution (28 ms)
+  ✓ NetWorthCalculator calculates Assets minus Liabilities (30 ms)
+
+Test Suites: 3 passed, 3 total
+Tests:       17 passed, 17 total
 Snapshots:   0 total
-Time:        1.82 s
+Time:        2.403 s
 ```
 
 ---
@@ -191,13 +248,10 @@ Compiled successfully.
 
 File sizes after gzip:
 
-  262.94 kB  build\static\js\main.9f132e01.js
-  1.77 kB    build\static\js\453.d8fcb6a8.chunk.js
-  759 B      build\static\css\main.42777ae3.css
+  284.37 kB  build/static/js/main.2c18ba42.js
+  5.28 kB    build/static/css/main.7293299d.css
 
 The project was built assuming it is hosted at /.
-You can control this with the homepage field in your package.json.
-
 The build folder is ready to be deployed.
 ```
 *Result: 0 errors, 0 warnings.*

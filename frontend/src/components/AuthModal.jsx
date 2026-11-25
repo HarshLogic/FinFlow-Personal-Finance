@@ -46,22 +46,84 @@ export default function AuthModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-[#0A0D14] border border-white/10 rounded-2xl w-full max-w-md p-6 m-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">{isLogin ? "Log In" : "Sign Up"}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backdropFilter: "blur(6px)",
+        padding: "16px",
+      }}
+    >
+      <div
+        style={{
+          background: "#282826",
+          border: "1px solid #3D3D37",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: "440px",
+          padding: "28px",
+          color: "#D8CBB3",
+          boxShadow: "0 20px 40px -15px rgba(0,0,0,0.5)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#FFFFFF", margin: 0, letterSpacing: "-0.02em" }}>
+            {isLogin ? "Log In" : "Sign Up"}
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#A8A294",
+              fontSize: "1.2rem",
+              cursor: "pointer",
+              padding: "4px 8px",
+              borderRadius: "6px",
+            }}
+          >
+            ✕
+          </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">{error}</div>}
+        {error && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "10px 14px",
+              background: "rgba(248, 113, 113, 0.15)",
+              border: "1px solid rgba(248, 113, 113, 0.3)",
+              borderRadius: "8px",
+              color: "#F87171",
+              fontSize: "0.85rem",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500 transition-colors"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "12px 14px",
+              background: "#1E1E1C",
+              border: "1px solid #3D3D37",
+              borderRadius: "10px",
+              color: "#FFFFFF",
+              fontSize: "0.9rem",
+              outline: "none",
+            }}
             required={!isLogin}
           />
           {!isLogin && (
@@ -70,7 +132,17 @@ export default function AuthModal({ isOpen, onClose }) {
               placeholder="User ID (Username)"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500 transition-colors"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "12px 14px",
+                background: "#1E1E1C",
+                border: "1px solid #3D3D37",
+                borderRadius: "10px",
+                color: "#FFFFFF",
+                fontSize: "0.9rem",
+                outline: "none",
+              }}
               required
             />
           )}
@@ -79,25 +151,47 @@ export default function AuthModal({ isOpen, onClose }) {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-emerald-500 transition-colors"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "12px 14px",
+              background: "#1E1E1C",
+              border: "1px solid #3D3D37",
+              borderRadius: "10px",
+              color: "#FFFFFF",
+              fontSize: "0.9rem",
+              outline: "none",
+            }}
             required
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-emerald-500 text-black font-semibold rounded-xl hover:bg-emerald-400 transition-colors cursor-pointer disabled:opacity-50"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#2F6BFF",
+              color: "#FFFFFF",
+              fontWeight: 700,
+              fontSize: "0.92rem",
+              borderRadius: "10px",
+              border: "none",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1,
+              transition: "background 0.2s ease",
+            }}
           >
-            {loading ? "Please wait..." : (isLogin ? "Log In" : "Sign Up")}
+            {loading ? "Please wait..." : isLogin ? "Log In" : "Sign Up"}
           </button>
         </form>
 
-        <div className="my-6 flex items-center gap-4">
-          <div className="h-px bg-white/10 flex-1" />
-          <span className="text-sm text-gray-500">OR</span>
-          <div className="h-px bg-white/10 flex-1" />
+        <div style={{ margin: "20px 0", display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ height: "1px", background: "#3D3D37", flex: 1 }} />
+          <span style={{ fontSize: "0.78rem", color: "#A8A294", textTransform: "uppercase", letterSpacing: "0.05em" }}>OR</span>
+          <div style={{ height: "1px", background: "#3D3D37", flex: 1 }} />
         </div>
 
-        <div className="flex justify-center">
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError("Google Login Failed")}
@@ -107,11 +201,20 @@ export default function AuthModal({ isOpen, onClose }) {
           />
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div style={{ marginTop: "20px", textAlign: "center", fontSize: "0.85rem", color: "#A8A294" }}>
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button
+            type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="text-emerald-400 hover:text-emerald-300 font-medium"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#2F6BFF",
+              fontWeight: 600,
+              cursor: "pointer",
+              padding: "0 4px",
+              textDecoration: "underline",
+            }}
           >
             {isLogin ? "Sign up" : "Log in"}
           </button>

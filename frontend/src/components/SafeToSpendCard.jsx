@@ -102,12 +102,12 @@ export default function SafeToSpendCard({ C, currency, safeData, onRefresh }) {
   return (
     <div
       style={{
-        background: `linear-gradient(145deg, ${C.card} 0%, ${C.surface} 100%)`,
+        background: C.card,
         border: `1px solid ${status === "SHORTFALL" ? C.red + "66" : C.border}`,
         borderRadius: 16,
         padding: "24px 28px",
         position: "relative",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
       }}
     >
       {/* Top Header */}
@@ -524,8 +524,8 @@ export default function SafeToSpendCard({ C, currency, safeData, onRefresh }) {
                     padding: 10,
                     borderRadius: 8,
                     border: "none",
-                    background: C.gold,
-                    color: "#0D0F14",
+                    background: C.accent || C.gold,
+                    color: C.accentForeground || "#FFFFFF",
                     cursor: "pointer",
                     fontSize: 13,
                     fontWeight: 700,

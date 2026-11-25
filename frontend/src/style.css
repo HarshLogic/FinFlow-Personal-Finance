@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Centralized Semantic CSS Custom Properties ─────────────────────────── */
+:root,
+[data-theme='dark'] {
+  --bg-page: #1E1E1C;
+  --bg-card: #282826;
+  --bg-surface: #30302D;
+  --bg-elevated: #30302D;
+  --text-primary: #D8CBB3;
+  --text-secondary: #A8A294;
+  --text-muted: #A8A294;
+  --accent-primary: #2F6BFF;
+  --accent-hover: #1E55E0;
+  --accent-foreground: #FFFFFF;
+  --accent-muted: rgba(47, 107, 255, 0.14);
+  --border-color: #3D3D37;
+  --border-subtle: #2C2C29;
+  --color-success: #4ADE80;
+  --color-error: #F87171;
+  --color-warning: #FBBF24;
+}
+
+[data-theme='light'] {
+  --bg-page: #F3EEE3;
+  --bg-card: #FAF7F0;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --text-primary: #111111;
+  --text-secondary: #746D63;
+  --text-muted: #746D63;
+  --accent-primary: #D9541E;
+  --accent-hover: #B84314;
+  --accent-foreground: #FFFFFF;
+  --accent-muted: rgba(217, 84, 30, 0.12);
+  --border-color: #DDD5C6;
+  --border-subtle: #EAE3D6;
+  --color-success: #15803D;
+  --color-error: #B91C1C;
+  --color-warning: #92400E;
+}
+
 *, *::before, *::after { 
   box-sizing: border-box; 
   margin: 0; 
@@ -13,19 +53,73 @@ html, body, #root {
   width: 100%; 
   margin: 0;
   padding: 0;
-  background-color: #0D0F14; 
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body { 
-  color: #F1F0EC; 
-  font-family: 'DM Sans', system-ui, sans-serif; 
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #13161D; }
-::-webkit-scrollbar-thumb { background: #232840; border-radius: 3px; }
+/* ── Financial Tabular Numerals ─────────────────────────────────────────── */
+.tabular-nums,
+[data-numeric='true'],
+input[type='number'] {
+  font-variant-numeric: tabular-nums;
+}
 
-input[type=range] { -webkit-appearance: none; height: 4px; background: #232840; border-radius: 2px; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #D4A843; cursor: pointer; }
+/* ── Custom Subtle Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { 
+  width: 6px; 
+  height: 6px; 
+}
+::-webkit-scrollbar-track { 
+  background: var(--bg-page); 
+}
+::-webkit-scrollbar-thumb { 
+  background: var(--border-color); 
+  border-radius: 3px; 
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: var(--text-muted); 
+}
 
-select { appearance: none; }
+/* ── Input Range & Form Elements ────────────────────────────────────────── */
+input[type=range] { 
+  -webkit-appearance: none; 
+  height: 4px; 
+  background: var(--border-color); 
+  border-radius: 2px; 
+}
+input[type=range]::-webkit-slider-thumb { 
+  -webkit-appearance: none; 
+  width: 16px; 
+  height: 16px; 
+  border-radius: 50%; 
+  background: var(--accent-primary); 
+  cursor: pointer; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+select { 
+  appearance: none; 
+}
+
+/* ── Accessible Focus Visible Rings ─────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* ── Reduced Motion Support ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

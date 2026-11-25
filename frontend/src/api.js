@@ -100,3 +100,30 @@ export const createSplit      = (data)   => api.post("/splits", data);
 export const updateSplit      = (id, data) => api.patch(`/splits/${id}`, data);
 export const settleSplit      = (id, data) => api.post(`/splits/${id}/settle`, data);
 export const deleteSplit      = (id)     => api.delete(`/splits/${id}`);
+
+// ── Monthly Personal CA Report ───────────────────────────────────────────────
+export const getMonthlyReportsHistory = () => api.get("/reports/monthly");
+export const getMonthlyReport         = (year, month) => api.get(`/reports/monthly/${year}/${month}`);
+export const generateMonthlyReport    = (data) => api.post("/reports/monthly/generate", data);
+export const exportReportPDF          = (year, month) => api.get(`/reports/monthly/${year}/${month}/pdf`, { responseType: "blob" });
+export const exportReportCSV          = (year, month) => api.get(`/reports/monthly/${year}/${month}/csv`, { responseType: "blob" });
+
+// ── Can I Afford It? Purchase Simulator ───────────────────────────────────────
+export const getAffordabilityProfile  = () => api.get("/affordability/profile");
+export const analyzeAffordability     = (data) => api.post("/affordability/analyze", data);
+export const savePurchaseSimulation   = (data) => api.post("/affordability/save", data);
+export const getSimulationHistory     = () => api.get("/affordability/history");
+export const getSimulationById        = (id) => api.get(`/affordability/${id}`);
+export const deleteSimulation         = (id) => api.delete(`/affordability/${id}`);
+export const convertSimulationToGoal  = (id, data) => api.post(`/affordability/${id}/create-goal`, data);
+export const recalculateSimulation    = (id) => api.post(`/affordability/${id}/recalculate`);
+export const getSavingsGoals          = () => api.get("/affordability/goals");
+export const createSavingsGoal        = (data) => api.post("/affordability/goals", data);
+
+// ── Financial Foundation & Rulebook ──────────────────────────────────────────
+export const getFinancialFoundation     = () => api.get("/financial-foundation");
+export const updateFinancialMilestones  = (data) => api.patch("/financial-foundation/milestones", data);
+export const completeOnboarding         = (data) => api.post("/financial-foundation/onboarding/complete", data);
+export const dismissOnboarding          = () => api.post("/financial-foundation/onboarding/dismiss");
+export const getFinancialRules          = () => api.get("/financial-rules");
+

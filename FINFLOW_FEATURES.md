@@ -239,3 +239,136 @@ This document details every feature currently implemented in the FinFlow reposit
 - **How it works:** Theme tokens and conversion rates are persisted in browser `localStorage`.
 - **Where to find it:** Top navigation bar toggle buttons.
 - **Status:** **WORKING** (Verified via header controls and shared theme system).
+
+---
+
+## 22. Monthly Personal CA Report & Financial Health Review
+
+- **What it does:** Acts as an automated Chartered Accountant review of your monthly financial health. Generates an explainable 0–100 Financial Health Score, audits spending across Needs vs. Wants, delivers prioritized recommendations, tracks savings progress, and generates professional downloadable PDF and CSV reports.
+- **Why users need it:** Looking at raw bank transactions does not answer critical questions like "Did I save enough?", "Is my spending increasing?", "Are upcoming bills protected?", or "What should I do differently next month?". This feature provides strategic financial clarity.
+- **How it works:**
+  1. Aggregates ledger data across income, personal consumption expenses, active bank/wallet accounts, recurring bills, investment assets (stocks, mutual funds, FDs), and peer receivables.
+  2. Evaluates an explainable 6-factor Financial Health Score:
+     - Savings Performance (max 25 pts)
+     - Budget Discipline & 50-30-20 ratio (max 20 pts)
+     - Emergency Fund Buffer Runway (max 20 pts)
+     - Debt & Fixed Obligations burden (max 15 pts)
+     - Investment Consistency & SIPs (max 10 pts)
+     - Cash Flow Stability (max 10 pts)
+  3. Analyzes top 5 spending categories, largest expenses, and compares metrics directly with the previous month (absolute and % changes).
+  4. Runs a rule-based recommendation engine prioritizing High, Medium, and Low action items with estimated financial impacts.
+  5. Exports a professional, 2-page PDF document (`finflow-ca-report-YYYY-MM.pdf`) and formula-injection-safe CSV file.
+  6. Automatically finalizes the previous month on the 1st day of every month at 02:00 AM via background cron scheduler.
+- **Real-life example:** On November 25, you generate your CA report. Your income is ₹1,00,000 and total spending is ₹42,000 (₹26,000 Needs, ₹16,000 Wants). You saved ₹58,000 (58% savings rate). FinFlow awards you a Financial Health Score of **88/100 (Healthy)**, highlights that your Food & Dining spend surged by 28% compared to October, and recommends capping weekend restaurant orders to save an extra ₹3,500 next month.
+- **Where to find it:** Sidebar navigation → **Monthly CA Report**, or **Dashboard** → **Monthly Personal CA Report** widget.
+- **Status:** **WORKING** (Verified via unit, integration, PDF/CSV generation, and frontend component tests).
+
+---
+
+## 23. Can I Afford It? — Smart Purchase Simulator
+
+- **What it does:** A fast, 100% deterministic purchase affordability simulator that answers whether you can safely afford a product today without damaging your financial stability, breaching your emergency fund, or risking unpaid bills.
+- **Why users need it:** Bank account balances create a dangerous illusion of wealth. Users frequently make impulse purchases, only to realize later that they don't have enough money for upcoming rent, school fees, or loan EMIs.
+- **Two Payment Modes:**
+  1. **Full Payment:** Simulates buying the product upfront in cash or debit.
+  2. **EMI Payment:** Simulates financing the product with down payment, reducing-balance interest, loan tenure, and upfront charges.
+- **How it works (Deterministic Mathematical Formulas):**
+  1. **Monthly Disposable Income:**
+     $$I_{\text{disposable}} = I - E - D - S$$
+     *(Unclamped: negative values transparently reflect ongoing monthly cash flow deficits).*
+  2. **Required Emergency Fund:**
+     $$F_{\text{emergency}} = (E + D) \times M \quad (M \in \{3, 6\})$$
+  3. **Available Spending Balance:**
+     $$\text{rawSpendingBalance} = B - F_{\text{emergency}} - C, \quad \text{availableSpendingBalance} = \max(0, \text{rawSpendingBalance})$$
+  4. **Canonical Affordability Status Classifications:**
+     - **COMFORTABLY AFFORDABLE (Emerald):**
+       - Full Payment: Purchase consumes $\le 25\%$ of available spending balance, emergency fund remains 100% intact, and cash flow is not in deficit.
+       - EMI: Monthly installment consumes $\le 30\%$ of disposable income, debt-to-income $\le 30\%$, and upfront costs are covered.
+     - **AFFORDABLE (Blue):**
+       - Full Payment: Purchase consumes $25\% < \text{ratio} \le 50\%$ of available spending balance with intact emergency fund.
+       - EMI: Monthly installment consumes $30\% < \text{ratio} \le 50\%$ of disposable income with debt-to-income $\le 30\%$.
+     - **RISKY (Amber):**
+       - Full Payment: Purchase consumes $50\% < \text{ratio} \le 100\%$ of available spending balance, or user has an active monthly cash flow deficit.
+       - EMI: Installment consumes $50\% < \text{ratio} \le 100\%$ of disposable income, or pushes total debt-to-income $> 30\%$.
+     - **NOT AFFORDABLE RIGHT NOW (Red):**
+       - Upfront costs exceed available spending balance, purchase exceeds unreserved cash, or monthly installment exceeds disposable income.
+     - **INSUFFICIENT DATA (Gray):**
+       - Non-positive purchase price or missing inputs.
+  5. **Savings Timeline ("How Long Until I Can Afford It?"):**
+     $$\text{totalFundingGap} = \max(0, P - \text{rawSpendingBalance})$$
+     $$\text{monthsRequired} = \lceil \text{totalFundingGap} / I_{\text{disposable}} \rceil \quad (\text{when } I_{\text{disposable}} > 0)$$
+  6. **One-Click Data Sync & Conversion:**
+     - **"Use My FinFlow Data":** One-click prefill of live salary, essential needs, existing EMIs, active savings goals, liquid bank balance, and unpaid commitments with full data provenance.
+     - **"Create Savings Goal":** Converts funding gaps into automated savings goals with a target date and monthly installment confirmation modal.
+- **Where to find it:** Sidebar navigation → **Can I Afford It?**, or **Dashboard** → **Can I Afford It? Simulator** widget.
+- **Status:** **WORKING & DETERMINISTIC** (Verified via 61 backend unit tests and 18 frontend test suites with zero external AI dependencies).
+
+---
+
+## 24. Financial Milestones & Financial Foundation Score
+
+- **What it does:** Tracks foundational risk shields and evaluates an explainable **Financial Foundation Score** strictly between 0 and 100.
+  - Emergency Fund Milestone (+50 Points)
+  - Health Insurance Milestone (+50 Points)
+  - Classifications:
+    - 0 points: "Starting Your Financial Journey"
+    - 50 points: "Building Your Financial Foundation"
+    - 100 points: "Financial Foundation Complete"
+- **Why users need it:** Before embarking on high-risk equity investing or speculative assets, users must establish foundational defense mechanisms. A single medical emergency or job disruption without an emergency buffer or health policy can force premature liquidation of long-term investments.
+- **How it works:**
+  - Evaluated and persisted on the backend (`FinancialFoundation` schema).
+  - Strictly independent from the transactional Financial Health Score (never conflated or modified by transaction volumes).
+  - Unchecking a completed milestone immediately removes 50 points; points cannot be accumulated repeatedly.
+  - Generates personalized contextual next steps based on current completion status.
+- **Real-life example:** A user marks "I have an emergency fund" (+50 pts) but does not have health insurance. Their Foundation Score is **50/100 (Building Your Financial Foundation)**. FinFlow advises: *"Great job on your emergency cushion! Next step: Protect those savings by securing an individual health insurance policy so a single hospital bill does not wipe out your emergency reserves."*
+- **Where to find it:** Sidebar navigation → **Milestones** (`/financial-milestones`), Dashboard Foundation card, and Monthly CA Report Foundation section.
+- **Status:** **WORKING** (Verified via backend mathematical purity tests and frontend React tests).
+
+---
+
+## 25. First-Login Financial Foundation Onboarding Popup
+
+- **What it does:** Displays an interactive, non-blocking onboarding modal on the user's initial login after registration (supporting both email/password and Google OAuth).
+- **Why users need it:** Guides new users immediately on the two essential personal finance prerequisites before they navigate through complex budgeting or investment screens.
+- **How it works:**
+  - Automatically queries the user's onboarding status (`GET /api/financial-foundation`).
+  - If `status === "NOT_STARTED"`, triggers a responsive modal with title: *"Build Your Financial Foundation"*.
+  - Features two interactive checkboxes:
+    1. *I have an emergency fund* (+50 pts)
+    2. *I have health insurance* (+50 pts)
+  - Live recalculates the Foundation Score in real time as the user selects or deselects items.
+  - Non-blocking actions:
+    - **Save & Continue:** Persists selected milestones to MongoDB and marks onboarding `COMPLETED`.
+    - **Skip for Now / Close:** Dismisses modal without blocking dashboard access, saving status `DISMISSED`.
+  - Persisted across devices and login sessions so it never repeatedly annoys the user.
+- **Where to find it:** Automatically triggered on first authenticated session, or revisitable via **Milestones** page.
+- **Status:** **WORKING** (Verified via modal UI unit tests and backend onboarding endpoints).
+
+---
+
+## 26. Financial Rulebook & 12 Interactive Rule Calculators
+
+- **What it does:** A comprehensive digital repository of **28 Golden Rules of Personal Finance** organized across 5 core pillars of wealth, attributed to Morgan Housel (*The Psychology of Money*), featuring search filtering, category filtering, accordion explanations, real-world INR examples, and 12 embedded interactive calculators.
+- **Pillars of Wealth (5 Categories):**
+  1. **Financial Protection (Rules 01–05):** Emergency Fund (Rule 01), Personal Health Insurance (Rule 02), Family Health Insurance (Rule 03), Term Life Insurance (Rule 04), High-Interest Debt Elimination (Rule 05).
+  2. **Budgeting and Spending (Rules 06–11):** 50/30/20 Rule (Rule 06), 5% Fun Money (Rule 07), 48-Hour Purchase Delay (Rule 08), 1% Spending Pause (Rule 09), Pay Yourself First (Rule 10), Frugality vs Cheapness (Rule 11).
+  3. **Investments and Wealth Building (Rules 12–18):** Power of Compounding (Rule 12), Time in the Market (Rule 13), Rule of 72 (Rule 14), 100 Minus Age Equity Allocation (Rule 15), Index Fund Core (Rule 16), Diversification (Rule 17), Real Return vs Inflation (Rule 18).
+  4. **Loans and Major Purchases (Rules 19–22):** 20/4/10 Car Rule (Rule 19), 30–40% EMI Ratio Limit (Rule 20), Home Purchase 3x Rule (Rule 21), Prepayment over Lifestyle (Rule 22).
+  5. **Long-Term Financial Planning (Rules 23–28):** 25x Retirement Corpus / FIRE (Rule 23), 4% Safe Withdrawal Rate (Rule 24), Net Worth Tracking (Rule 25), Estate & Will Planning (Rule 26), Multiple Income Streams (Rule 27), Financial Independence Mindset (Rule 28).
+- **12 Interactive Calculators:**
+  1. *Emergency Fund Target Calculator* (Target = Expenses $\times$ Months buffer)
+  2. *Term Life Coverage Calculator* (Cover = Income $\times$ Multiplier + Debts)
+  3. *50/30/20 Budgeting Calculator* (Needs 50%, Wants 30%, Savings 20%)
+  4. *Guilt-Free Fun Money Calculator* (Take-home $\times$ Fun % $\rightarrow$ Monthly & Weekly allowances)
+  5. *SIP & Compound Interest Calculator* (Principal, Monthly SIP, Rate %, Tenure $\rightarrow$ Future Corpus)
+  6. *Rule of 72 Doubling Time Calculator* (Years to double = $72 / r$)
+  7. *Purchasing Power & Real Return Calculator* (Fisher equation: $((1+r)/(1+i) - 1) \times 100$)
+  8. *20/4/10 Car Rule Calculator* (20% down, 4-yr loan EMI, 10% monthly income limit verdict)
+  9. *30–40% EMI Ratio Checker* (Total EMIs / Income with Safe, Caution, and High-Risk statuses)
+  10. *FIRE 25x Retirement Corpus Calculator* (Annual Expenses $\times$ 25 Target)
+  11. *4% Safe Withdrawal Rate Simulator* (Corpus $\times$ 4% Annual & Monthly cash flows)
+  12. *Net Worth Calculator* (Total Assets $-$ Total Liabilities)
+- **Safety & Arithmetic:** All calculators feature division-by-zero protection, non-negative bounds checking, NaN prevention, and are strictly simulation-only (no side effects on actual ledger records).
+- **Where to find it:** Sidebar navigation → **Rulebook** (`/financial-rulebook`), Dashboard Rulebook banner, and Milestones Rulebook link.
+- **Status:** **WORKING** (Verified via backend rules integrity tests, calculator unit tests, and production React build).
+

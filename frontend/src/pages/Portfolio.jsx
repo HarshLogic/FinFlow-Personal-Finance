@@ -35,7 +35,7 @@ function AddRow({ fields, onAdd, saving, C }) {
       ))}
       <button onClick={() => { onAdd(vals); setVals(Object.fromEntries(fields.map(f => [f.key, f.default ?? ""]))); }}
         disabled={saving}
-        style={{ padding: "8px 18px", background: saving ? C.gold + "88" : C.gold, color: "#0D0F14", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: saving ? "not-allowed" : "pointer" }}>
+        style={{ padding: "8px 18px", background: saving ? (C.accent || C.gold) + "88" : (C.accent || C.gold), color: "#FFFFFF", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 12, cursor: saving ? "not-allowed" : "pointer" }}>
         {saving ? "…" : "+ Add"}
       </button>
     </div>
@@ -146,7 +146,7 @@ function StocksTab({ C }) {
                             step="0.01"
                             style={{ width: 80, padding: "4px 8px", background: C.surface, border: `1px solid ${C.gold}`, borderRadius: 6, color: C.text, fontSize: 12 }} />
                           <button onClick={() => saveCMP(st._id, cmpEdit[st._id])}
-                            style={{ background: C.gold, color: "#0D0F14", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>✓</button>
+                            style={{ background: C.accent || C.gold, color: "#FFFFFF", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>✓</button>
                         </div>
                       ) : (
                         <span style={{ fontFamily: "monospace", cursor: "pointer", color: C.text }}
@@ -419,7 +419,7 @@ function LiquidTab({ C }) {
           onKeyDown={e => e.key === "Enter" && save()}
           style={{ flex: 1, padding: "10px 14px", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 9, color: C.text, fontSize: 14, outline: "none" }} />
         <button onClick={save} disabled={saving}
-          style={{ padding: "10px 22px", background: saving ? C.gold + "88" : C.gold, color: "#0D0F14", border: "none", borderRadius: 9, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
+          style={{ padding: "10px 22px", background: saving ? (C.accent || C.gold) + "88" : (C.accent || C.gold), color: "#FFFFFF", border: "none", borderRadius: 8, fontWeight: 600, cursor: saving ? "not-allowed" : "pointer" }}>
           {saving ? "…" : success ? "✓ Saved" : "Update"}
         </button>
       </div>
@@ -437,9 +437,9 @@ export default function Portfolio({ C }) {
       <div style={{ display: "flex", gap: 4, background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 4, width: "fit-content" }}>
         {TABS.map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
-            style={{ padding: "8px 16px", borderRadius: 9, border: "none", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.2s",
-              background: tab === k ? C.gold : "transparent",
-              color:      tab === k ? "#0D0F14" : C.muted }}>
+            style={{ padding: "8px 16px", borderRadius: 8, border: "none", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.2s",
+              background: tab === k ? (C.accent || C.gold) : "transparent",
+              color:      tab === k ? "#FFFFFF" : C.muted }}>
             {l}
           </button>
         ))}

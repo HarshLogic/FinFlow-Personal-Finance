@@ -49,7 +49,7 @@ const Navbar = ({ onOpenAuth }) => {
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-[#050505]/80 backdrop-blur-xl border-b border-white/10 py-4' : 'bg-transparent py-6'
+        isScrolled ? 'bg-[#1E1E1C]/85 backdrop-blur-xl border-b border-[#3D3D37] py-4' : 'bg-transparent py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -108,44 +108,44 @@ const Navbar = ({ onOpenAuth }) => {
 
 const Hero = ({ onOpenAuth }) => {
   return (
-    <section className="relative min-h-screen bg-[#050505] flex items-center pt-32 pb-20 overflow-hidden">
+    <section className="relative min-h-screen bg-[#1E1E1C] flex items-center pt-32 pb-20 overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15], x: [0, 50, 0] }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15], x: [0, 50, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-emerald-600/30 blur-[120px]"
+          className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-[#2F6BFF]/25 blur-[120px]"
         />
         <motion.div 
-          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.25, 0.1], y: [0, -50, 0] }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1], y: [0, -50, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-[30%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-cyan-600/20 blur-[120px]"
+          className="absolute top-[30%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#D8CBB3]/15 blur-[120px]"
         />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
         <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-2xl">
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-xs font-semibold tracking-widest text-emerald-400 uppercase">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-[#2F6BFF]/30 bg-[#2F6BFF]/10 text-xs font-semibold tracking-widest text-[#2F6BFF] uppercase">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2F6BFF] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2F6BFF]"></span>
             </span>
             Finance Flow
           </motion.div>
           
-          <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-6">
+          <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold text-[#D8CBB3] leading-[1.1] tracking-tight mb-6">
             Track smarter, <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Invest better.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2F6BFF] to-[#D8CBB3]">Invest better.</span>
           </motion.h1>
           
-          <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-400 mb-10 leading-relaxed font-light">
+          <motion.p variants={fadeUp} className="text-lg md:text-xl text-[#A8A294] mb-10 leading-relaxed font-light">
             Take absolute control of your financial destiny. Finance Flow combines real-time tracking, predictive analytics, and bank-grade security into one seamless experience.
           </motion.p>
           
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
-            <button onClick={onOpenAuth} className="group relative px-8 py-4 bg-white text-black font-semibold rounded-xl text-base overflow-hidden transition-transform active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer">
+            <button onClick={onOpenAuth} className="group relative px-8 py-4 bg-[#2F6BFF] text-white font-semibold rounded-xl text-base overflow-hidden transition-transform active:scale-95 shadow-[0_0_30px_rgba(47,107,255,0.25)] hover:bg-[#1E55E0] flex items-center justify-center gap-2 cursor-pointer">
                 Start Building Wealth <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-            <a href="https://fin-flow-personal-finance.vercel.app" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 backdrop-blur-md transition-all flex items-center justify-center cursor-pointer">
+            <a href="https://fin-flow-personal-finance.vercel.app" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/5 border border-[#3D3D37] text-[#D8CBB3] font-semibold rounded-xl hover:bg-white/10 backdrop-blur-md transition-all flex items-center justify-center cursor-pointer">
               View Live Demo
             </a>
           </motion.div>
@@ -160,7 +160,7 @@ const Hero = ({ onOpenAuth }) => {
           <motion.div 
             animate={{ y: [-15, 15, -15] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full rounded-2xl bg-[#0a0a0a]/80 border border-white/10 backdrop-blur-2xl shadow-2xl p-6"
+            className="w-full rounded-2xl bg-[#282826] border border-[#3D3D37] shadow-xl p-6"
           >
             <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
               <div>
@@ -238,19 +238,19 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-32 bg-[#050505] relative">
+    <section id="features" className="py-32 bg-[#1E1E1C] relative">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-20">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Everything you need. <br/> <span className="text-gray-500">Nothing you don't.</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-[#D8CBB3] mb-6 tracking-tight">
+            Everything you need. <br/> <span className="text-[#A8A294]">Nothing you don't.</span>
           </h2>
         </motion.div>
         <div className="grid md:grid-cols-2 gap-6">
           {features.map((feature, idx) => (
-            <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="group relative bg-white/[0.03] border border-white/5 rounded-2xl p-8 hover:bg-white/[0.05] transition-colors overflow-hidden">
-              <div className="w-14 h-14 rounded-xl bg-[#111] border border-white/10 flex items-center justify-center mb-6 shadow-lg">{feature.icon}</div>
-              <h3 className="text-2xl font-semibold text-white mb-3 tracking-tight">{feature.title}</h3>
-              <p className="text-gray-400 leading-relaxed font-light">{feature.desc}</p>
+            <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="group relative bg-[#282826] border border-[#3D3D37] rounded-2xl p-8 hover:border-[#2F6BFF]/40 transition-colors overflow-hidden">
+              <div className="w-14 h-14 rounded-xl bg-[#30302D] border border-[#3D3D37] text-[#2F6BFF] flex items-center justify-center mb-6 shadow-md">{feature.icon}</div>
+              <h3 className="text-2xl font-semibold text-[#D8CBB3] mb-3 tracking-tight">{feature.title}</h3>
+              <p className="text-[#A8A294] leading-relaxed font-light">{feature.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -261,8 +261,8 @@ const Features = () => {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#050505] border-t border-white/10 pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
+    <footer className="bg-[#1E1E1C] border-t border-[#3D3D37] pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#A8A294]">
         <p>© 2026 Finance Flow Inc. All rights reserved.</p>
         <div className="flex gap-6">
           <a href="#!" className="hover:text-white transition-colors">Privacy Policy</a>
@@ -277,7 +277,7 @@ export default function LandingPage() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-[#1E1E1C] text-[#D8CBB3] selection:bg-[#2F6BFF]/30 selection:text-white">
       <Navbar onOpenAuth={() => setIsAuthOpen(true)} />
       <main>
         <Hero onOpenAuth={() => setIsAuthOpen(true)} />
